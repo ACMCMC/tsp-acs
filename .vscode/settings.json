@@ -1,0 +1,8 @@
+{
+  "files.associations": {
+    "*.html": "html",
+    "*.h": "c",
+    "*.c": "c",
+    "iosfwd": "cpp"
+  }
+}

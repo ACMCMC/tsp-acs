@@ -17,14 +17,33 @@
         double cost;
 };*/
 
-class TSPStatement {
+class TSPStatement
+{
+public:
+    void read(const char *filename);
+    int getDimension() const;
+    double getDistance(int i, int j) const;
+
+private:
+    class Node
+    {
     public:
-        void read(const char* filename);
-        int getDimension() const;
-        double getDistance(int i, int j) const;
+        Node(int id, double x, double y);
+        double getX() const;
+        double getY() const;
+        int getId() const;
+
     private:
-        int dimension;
-        std::string name;
-        int bestKnown;
-        blaze::DynamicMatrix<double> *distanceMatrix;
+        double x;
+        double y;
+        int id;
+    };
+
+    int dimension;
+    std::string name;
+    int bestKnown;
+    blaze::DynamicMatrix<double> distanceMatrix;
+    std::vector<Node> nodes;
+    
+    void createDistanceMatrix();
 };
