@@ -10,3 +10,4 @@ tsp_run
 tsp_lib
 Testing
 libtsp_lib.a
+CTestTestfile.cmake
