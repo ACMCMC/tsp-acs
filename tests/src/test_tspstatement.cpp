@@ -47,10 +47,14 @@ int test_dist_matrix_2() {
               std::cout << "Specific values: manualMatrix=" << manualMatrix(i,j) << ", statement=" << statement.getDistance(i, j) << std::endl;
               return 1;  // If the difference is greater than 0.001, return 1 (error)
           }
+          else {
+              std::cout << "Equal values! i=" << i << ", j=" << j << std::endl;
+              std::cout << "Specific values: manualMatrix=" << manualMatrix(i,j) << ", statement=" << statement.getDistance(i, j) << std::endl;
+          }
       }
   }
 
-  return 0;
+  return 1;
 }
 
 int main()

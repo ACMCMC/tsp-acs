@@ -17,22 +17,20 @@ void Ant::move(blaze::DynamicMatrix<double> &pheromoneMatrix, blaze::DynamicMatr
   double exploitProbability = 0.5;
 
   // Calculate the probability of moving to each node in the unvisited nodes list
-  std::vector<double> probabilities;
+  blaze::DynamicVector<double> probabilities(unvisitedNodes.size());
   double sum = 0;
-  for (Node node : unvisitedNodes)
+  for (long unsigned int i = 0; i < unvisitedNodes.size(); i++)
   {
+    Node node = unvisitedNodes[i];
     double pheromone = pheromoneMatrix(currentNode.getInternalId(), node.getInternalId());
     double distance = distanceMatrix(currentNode.getInternalId(), node.getInternalId());
     double probability = pow(pheromone, TSPConstants::alpha) * pow(1.0 / distance, TSPConstants::beta);
-    probabilities.push_back(probability);
+    probabilities[i] = probability;
     sum += probability;
   }
 
   // Normalize the probabilities
-  for (long unsigned int i = 0; i < probabilities.size(); i++)
-  {
-    probabilities[i] /= sum;
-  }
+  probabilities /= sum;
 
   // Decide whether to exploit or explore based on exploitProbability
   double random = (double)rand() / RAND_MAX;

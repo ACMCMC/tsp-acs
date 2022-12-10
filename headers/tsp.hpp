@@ -10,8 +10,8 @@ public:
     static constexpr double rho = 0.1;      // Evaporation rate
     static constexpr double phi = 0.1;      // Pheromone decay rate
     static constexpr double tau0 = 1;       // Initial pheromone
-    static constexpr double alpha = 5;      // Importance of pheromone
-    static constexpr double beta = 1;       // Importance of distance
+    static constexpr double alpha = 1;      // Importance of pheromone
+    static constexpr double beta = 5;       // Importance of distance
 };
 
 class Node
@@ -36,15 +36,19 @@ public:
     long unsigned int getDimension() const;
     double getDistance(long unsigned int i, long unsigned int j) const;
     void solve_aco();
-
+    void createDistanceMatrix();
+    long unsigned int getBestKnown() const;
+    double getBestCost() const;
+    std::string getName() const;
+    blaze::DynamicVector<long unsigned int, false> getBestPath() const;
 private:
     long unsigned int dimension;
     std::string name;
     long unsigned int bestKnown;
     blaze::DynamicMatrix<double> distanceMatrix;
     std::vector<Node> nodes;
-
-    void createDistanceMatrix();
+    blaze::DynamicVector<long unsigned int> bestPath;
+    double bestCost = std::numeric_limits<double>::max();
 };
 
 /**

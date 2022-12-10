@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <chrono>
 
 long unsigned int TSPStatement::getDimension() const
 {
@@ -12,6 +13,19 @@ long unsigned int TSPStatement::getDimension() const
 double TSPStatement::getDistance(long unsigned int i, long unsigned int j) const
 {
     return distanceMatrix(i, j);
+}
+
+#define PBSTR "||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"
+#define PBWIDTH 60
+
+void printProgress(double percentage, std::string problemName)
+{
+    // Taken from https://stackoverflow.com/questions/14539867/how-to-display-a-progress-indicator-in-pure-c-c-cout-printf
+    int val = (int)(percentage * 100);
+    int lpad = (int)(percentage * PBWIDTH);
+    int rpad = PBWIDTH - lpad;
+    printf("\r%s: %3d%% [%.*s%*s]", problemName.c_str(), val, lpad, PBSTR, rpad, "");
+    fflush(stdout);
 }
 
 void TSPStatement::createDistanceMatrix()
@@ -112,7 +126,7 @@ void TSPStatement::read(const char *filename)
     file.close();
 }
 
-void offlineUpdatePheromone(blaze::DynamicMatrix<double> &pheromoneMatrix, blaze::DynamicMatrix<double> &distanceMatrix, blaze::DynamicVector<int> &visitedNodes)
+void offlineUpdatePheromone(blaze::DynamicMatrix<double> &pheromoneMatrix, blaze::DynamicMatrix<double> &distanceMatrix, blaze::DynamicVector<long unsigned int> &visitedNodes)
 {
     // Calculate the length of the tour
     double tourLength = 0;
@@ -139,32 +153,33 @@ void TSPStatement::solve_aco()
 {
     // Solution using the Ant Colony Optimization algorithm
 
-    // Print distance matrix
-    std::cout << "Distance matrix:" << std::endl;
-    std::cout << distanceMatrix << std::endl;
-
     // Parameters
-    long unsigned int nAnts = 10;           // Number of ants
-    long unsigned int nIterations = 10000; // Number of iterations
+    long unsigned int nAnts = 10;                                             // Number of ants
+    auto finish = std::chrono::system_clock::now() + std::chrono::minutes{3}; // Stop after 3 minutes
+    double deadlineInSeconds = std::chrono::duration<double>(std::chrono::minutes{3}).count();
 
     // Initialize pheromone matrix
     long unsigned int dimension = getDimension();
     double tau = TSPConstants::tau0;
     blaze::DynamicMatrix<double> pheromone(dimension, dimension, tau); // All elements are tau0, even the diagonal, but it doesn't matter (it will never be used)
 
-    // Initialize best solution
-    blaze::DynamicVector<int> bestSolution(dimension);
-    double bestCost = std::numeric_limits<double>::max();
-
     // Initialize ants
     // Randomly position nAnts artificial ants on nNodes nodes
     std::vector<Ant> ants;
     // Main loop
-    for (long unsigned int i = 0; i < nIterations; i++)
+    for (long unsigned int iteration = 0; std::chrono::system_clock::now() < finish; iteration++)
     {
+        // Print progress
+        // Only print progress every 100 iterations
+        if (iteration % 100 == 0)
+        {
+            double remainingSeconds = std::chrono::duration<double>(finish - std::chrono::system_clock::now()).count();
+            printProgress(1.0 - (remainingSeconds / deadlineInSeconds), name);
+        }
+
         // Generate nAnts ants
         ants.clear();
-        for (long unsigned int i = 0; i < nAnts; i++)
+        for (long unsigned int j = 0; j < nAnts; j++)
         {
             // Choose a random node
             long unsigned int node = rand() % dimension;
@@ -198,25 +213,42 @@ void TSPStatement::solve_aco()
             if (cost < bestCost)
             {
                 bestCost = cost;
-                bestSolution = ant.getVisitedNodesAsVector();
+                bestPath = ant.getVisitedNodesAsVector();
 
-                std::cout << std::endl
-                          << "Iteration " << i << std::endl;
-                std::cout << "Best cost: " << bestCost << std::endl;
-                std::cout << "Best solution: " << bestSolution << std::endl;
-                std::cout << "Pheromone matrix: " << std::endl;
-                //std::cout << pheromone << std::endl;
+                // std::cout << std::endl
+                //           << "Iteration " << iteration << std::endl;
+                // std::cout << "Best cost: " << bestCost << std::endl;
+                // std::cout << "Best solution: " << bestPath << std::endl;
+                // std::cout << "Pheromone matrix: " << std::endl;
+                // std::cout << pheromone << std::endl;
             }
         }
 
         // Offline pheromone update
-        offlineUpdatePheromone(pheromone, distanceMatrix, bestSolution);
+        offlineUpdatePheromone(pheromone, distanceMatrix, bestPath);
 
         // Print pheromone matrix
         // std::cout << "Pheromone matrix: " << std::endl;
         // std::cout << pheromone << std::endl;
     }
+}
 
-    std::cout << "Best cost: " << bestCost << std::endl;
-    std::cout << "Best solution: " << bestSolution << std::endl;
+blaze::DynamicVector<long unsigned int> TSPStatement::getBestPath() const
+{
+    return bestPath;
+}
+
+long unsigned int TSPStatement::getBestKnown() const
+{
+    return bestKnown;
+}
+
+double TSPStatement::getBestCost() const
+{
+    return bestCost;
+}
+
+std::string TSPStatement::getName() const
+{
+    return name;
 }
