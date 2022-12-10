@@ -12,12 +12,9 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
-file(GLOB SOURCES
-    headers/*.h
-    implementations/*.cpp
-)
+include_directories (headers)
 
-add_executable(tsp ${SOURCES})
+add_subdirectory (implementations) 
 
-#enable_testing()
-#add_subdirectory(tests)
+enable_testing ()
+add_subdirectory(tests)

@@ -2,7 +2,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "tsp"
+			"path" : "tests/tsp_tst"
 		}
 	],
 	"backtrace" : 1,
@@ -10,10 +10,13 @@
 	{
 		"commands" : 
 		[
-			"add_executable"
+			"add_executable",
+			"target_link_libraries",
+			"include_directories"
 		],
 		"files" : 
 		[
+			"tests/CMakeLists.txt",
 			"CMakeLists.txt"
 		],
 		"nodes" : 
@@ -24,8 +27,23 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 20,
+				"line" : 9,
 				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 13,
+				"parent" : 0
+			},
+			{
+				"file" : 1
+			},
+			{
+				"command" : 2,
+				"file" : 1,
+				"line" : 15,
+				"parent" : 3
 			}
 		]
 	},
@@ -38,17 +56,29 @@
 					"fragment" : "-Wall -Wextra -g  "
 				}
 			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 4,
+					"path" : "/home/acmc/repos/usi-ai/headers"
+				}
+			],
 			"language" : "CXX",
 			"sourceIndexes" : 
 			[
 				0,
-				1,
-				2,
-				3
+				1
 			]
 		}
 	],
-	"id" : "tsp::@6890427a1f51a3e7e1df",
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "tsp_lib::@981473d02ab0e23084ed"
+		}
+	],
+	"id" : "tsp_tst::@a44f0ac069e85531cdee",
 	"link" : 
 	{
 		"commandFragments" : 
@@ -60,16 +90,21 @@
 			{
 				"fragment" : "-rdynamic",
 				"role" : "flags"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "../implementations/libtsp_lib.a",
+				"role" : "libraries"
 			}
 		],
 		"language" : "CXX"
 	},
-	"name" : "tsp",
-	"nameOnDisk" : "tsp",
+	"name" : "tsp_tst",
+	"nameOnDisk" : "tsp_tst",
 	"paths" : 
 	{
-		"build" : ".",
-		"source" : "."
+		"build" : "tests",
+		"source" : "tests"
 	},
 	"sourceGroups" : 
 	[
@@ -78,9 +113,7 @@
 			"sourceIndexes" : 
 			[
 				0,
-				1,
-				2,
-				3
+				1
 			]
 		}
 	],
@@ -89,25 +122,13 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "implementations/ant.cpp",
+			"path" : "tests/src/test_ant.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "implementations/main.cpp",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 1,
-			"compileGroupIndex" : 0,
-			"path" : "implementations/node.cpp",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 1,
-			"compileGroupIndex" : 0,
-			"path" : "implementations/tspstatement.cpp",
+			"path" : "tests/src/test_tspstatement.cpp",
 			"sourceGroupIndex" : 0
 		}
 	],

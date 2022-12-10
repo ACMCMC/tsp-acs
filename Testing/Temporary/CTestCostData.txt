@@ -1,3 +1,2 @@
-tsp_test 2 0
+tsp_tst 15 0.000135546
 ---
-tsp_test

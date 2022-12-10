@@ -145,7 +145,7 @@ void TSPStatement::solve_aco()
 
     // Parameters
     long unsigned int nAnts = 10;           // Number of ants
-    long unsigned int nIterations = 100000; // Number of iterations
+    long unsigned int nIterations = 10000; // Number of iterations
 
     // Initialize pheromone matrix
     long unsigned int dimension = getDimension();
@@ -205,7 +205,7 @@ void TSPStatement::solve_aco()
                 std::cout << "Best cost: " << bestCost << std::endl;
                 std::cout << "Best solution: " << bestSolution << std::endl;
                 std::cout << "Pheromone matrix: " << std::endl;
-                std::cout << pheromone << std::endl;
+                //std::cout << pheromone << std::endl;
             }
         }
 

@@ -1,8 +1,13 @@
 cmake_minimum_required(VERSION 2.6.0)
 
-file(GLOB TESTS
-    ./*.cpp
-)
+set(BINARY ${CMAKE_PROJECT_NAME}_tst)
 
-add_executable(tsp_tests ${TESTS})
-add_test(tsp_test tsp_tests)
+file(GLOB_RECURSE TEST_SOURCES LIST_DIRECTORIES false *.h *.cpp)
+
+set(SOURCES ${TEST_SOURCES})
+
+add_executable(${BINARY} ${TEST_SOURCES})
+
+add_test(NAME ${BINARY} COMMAND ${BINARY})
+
+target_link_libraries(${BINARY} PUBLIC ${CMAKE_PROJECT_NAME}_lib)

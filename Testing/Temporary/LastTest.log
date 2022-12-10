@@ -1,18 +1,102 @@
-Start testing: Dec 08 13:55 CET
+Start testing: Dec 10 16:54 CET
 ----------------------------------------------------------
-1/1 Testing: tsp_test
-1/1 Test: tsp_test
-Command: "/home/acmc/repos/usi-ai/tests/tsp_tests"
+1/1 Testing: tsp_tst
+1/1 Test: tsp_tst
+Command: "/home/acmc/repos/usi-ai/tests/tsp_tst"
 Directory: /home/acmc/repos/usi-ai/tests
-"tsp_test" start time: Dec 08 13:55 CET
+"tsp_tst" start time: Dec 10 16:54 CET
 Output:
 ----------------------------------------------------------
+Name: eil76
+Best known: 538
+Dimension: 76
+Distance matrix: 76x76
+Dist: (1): 8.06226
+Dist: (33): 6.08276
+Dist: (63): 6.08276
+Dist: (16): 9
+Dist: (3): 3
+Dist: (44): 5.09902
+Dist: (32): 7.2111
+Dist: (9): 4.12311
+Dist: (39): 5
+Dist: (72): 5
+Dist: (58): 6
+Dist: (10): 13.4536
+Dist: (31): 21.8403
+Dist: (55): 9.21954
+Dist: (25): 8.24621
+Dist: (50): 6
+Dist: (18): 13.1529
+Dist: (24): 7.07107
+Dist: (49): 10.0499
+Dist: (23): 5.83095
+Dist: (56): 10
+Dist: (41): 4.47214
+Dist: (43): 5.09902
+Dist: (42): 9
+Dist: (64): 13.6015
+Dist: (22): 12.2066
+Dist: (61): 10.6301
+Dist: (21): 6.32456
+Dist: (47): 6.40312
+Dist: (36): 7.2111
+Dist: (69): 9.05539
+Dist: (71): 5.09902
+Dist: (60): 4.47214
+Dist: (70): 6
+Dist: (20): 6.08276
+Dist: (37): 7.07107
+Dist: (5): 8.06226
+Dist: (15): 4.24264
+Dist: (57): 8.544
+Dist: (13): 7.81025
+Dist: (54): 8.60233
+Dist: (19): 9
+Dist: (14): 10.6301
+Dist: (59): 15.2643
+Dist: (66): 7.28011
+Dist: (65): 5
+Dist: (38): 8.06226
+Dist: (11): 8
+Dist: (53): 8.60233
+Dist: (7): 5
+Dist: (35): 5
+Dist: (8): 5
+Dist: (46): 2.23607
+Dist: (34): 4.47214
+Dist: (52): 4.12311
+Dist: (27): 6.40312
+Dist: (45): 4.47214
+Dist: (29): 6.40312
+Dist: (48): 7.07107
+Dist: (30): 9.21954
+Dist: (4): 5.38516
+Dist: (75): 3
+Dist: (76): 5.38516
+Dist: (67): 5.65685
+Dist: (26): 7.81025
+Dist: (12): 5.09902
+Dist: (40): 6.7082
+Dist: (17): 6.40312
+Dist: (51): 6.40312
+Dist: (6): 5.09902
+Dist: (68): 7.28011
+Dist: (2): 7.2111
+Dist: (74): 6.40312
+Dist: (28): 6.40312
+Dist: (62): 5
+Total dist: 540.002
+Name: eil76
+Best known: 538
+Dimension: 76
+Distance matrix: 76x76
 <end of output>
 Test time =   0.00 sec
 ----------------------------------------------------------
-Test Failed.
-"tsp_test" end time: Dec 08 13:55 CET
-"tsp_test" time elapsed: 00:00:00
+Test Passed.
+"tsp_tst" end time: Dec 10 16:54 CET
+"tsp_tst" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-End testing: Dec 08 13:55 CET
+End testing: Dec 10 16:54 CET
