@@ -4,14 +4,16 @@
 #include <array>
 #include <string>
 #include <blaze/Blaze.h>
+#include <chrono>
 
 class TSPConstants {
 public:
     static constexpr double rho = 0.1;      // Evaporation rate
     static constexpr double phi = 0.1;      // Pheromone decay rate
     static constexpr double tau0 = 1;       // Initial pheromone
-    static constexpr double alpha = 1;      // Importance of pheromone
-    static constexpr double beta = 5;       // Importance of distance
+    static double alpha;      // Importance of pheromone
+    static double beta;       // Importance of distance
+    static constexpr auto timeout = std::chrono::seconds{5}; // Timeout for the algorithm
 };
 
 class Node
@@ -38,7 +40,7 @@ public:
     void solve_aco();
     void createDistanceMatrix();
     long unsigned int getBestKnown() const;
-    double getBestCost() const;
+    int getBestCost() const;
     std::string getName() const;
     blaze::DynamicVector<long unsigned int, false> getBestPath() const;
 private:
@@ -48,7 +50,7 @@ private:
     blaze::DynamicMatrix<double> distanceMatrix;
     std::vector<Node> nodes;
     blaze::DynamicVector<long unsigned int> bestPath;
-    double bestCost = std::numeric_limits<double>::max();
+    int bestCost = std::numeric_limits<int>::max();
 };
 
 /**
@@ -59,12 +61,12 @@ class Ant
 public:
     Ant(Node& start, std::vector<Node> nodes);
     ~Ant();
-    void move(blaze::DynamicMatrix<double> &pheromoneMatrix,blaze::DynamicMatrix<double> &distanceMatrix);
+    void move(blaze::DynamicMatrix<double> &pheromoneMatrix,blaze::DynamicMatrix<double> &distanceMatrix, double exploitProbability);
     void offlineUpdatePheromone(blaze::DynamicMatrix<double> &pheromoneMatrix, blaze::DynamicMatrix<double> &distanceMatrix);
     void localUpdatePheromone(blaze::DynamicMatrix<double> &pheromoneMatrix);
-    double getTourLength(blaze::DynamicMatrix<double> &distanceMatrix);
+    int getSolutionLength(blaze::DynamicMatrix<double> &distanceMatrix);
     std::vector<Node> getVisitedNodes();
-    blaze::DynamicVector<long unsigned int> getVisitedNodesAsVector();
+    blaze::DynamicVector<long unsigned int> getSolutionAsVector();
 private:
     Node currentNode;
     std::vector<Node> visitedNodes;

@@ -17,4 +17,4 @@ include_directories (headers)
 add_subdirectory (implementations) 
 
 enable_testing ()
-add_subdirectory(tests)
+#add_subdirectory(tests)

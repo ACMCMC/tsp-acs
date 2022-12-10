@@ -7,6 +7,6 @@ int testMove()
 {
   Node start(1, 0, 0);
   Ant ant(start, {Node(2, 0, 0), Node(3, 0, 0), Node(4, 0, 0)});
-  ant.move(distanceMatrix, pheromoneMatrix);
+  ant.move(distanceMatrix, pheromoneMatrix, 0.5);
   return 0;
 }

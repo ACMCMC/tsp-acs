@@ -12,10 +12,8 @@ Ant::Ant(Node& start, std::vector<Node> nodes) : currentNode(start), visitedNode
   //std::cout << "Ant " << _id << ": Created at node " << start.getHumanId() << std::endl;
 }
 
-void Ant::move(blaze::DynamicMatrix<double> &pheromoneMatrix, blaze::DynamicMatrix<double> &distanceMatrix)
+void Ant::move(blaze::DynamicMatrix<double> &pheromoneMatrix, blaze::DynamicMatrix<double> &distanceMatrix, double exploitProbability)
 {
-  double exploitProbability = 0.5;
-
   // Calculate the probability of moving to each node in the unvisited nodes list
   blaze::DynamicVector<double> probabilities(unvisitedNodes.size());
   double sum = 0;
@@ -89,14 +87,15 @@ void Ant::localUpdatePheromone(blaze::DynamicMatrix<double> &pheromoneMatrix)
   pheromoneMatrix(node2, node1) = newPheromoneVal;
 }
 
-double Ant::getTourLength(blaze::DynamicMatrix<double> &distanceMatrix)
+int Ant::getSolutionLength(blaze::DynamicMatrix<double> &distanceMatrix)
 {
   double tourLength = 0;
   for (long unsigned int i = 0; i < visitedNodes.size() - 1; i++)
   {
     tourLength += distanceMatrix(visitedNodes[i].getInternalId(), visitedNodes[i + 1].getInternalId());
   }
-  return tourLength;
+  tourLength += distanceMatrix(visitedNodes[visitedNodes.size() - 1].getInternalId(), visitedNodes[0].getInternalId()); // Add the distance from the last node to the first node
+  return round(tourLength);
 }
 
 std::vector<Node> Ant::getVisitedNodes()
@@ -104,13 +103,14 @@ std::vector<Node> Ant::getVisitedNodes()
   return visitedNodes;
 }
 
-blaze::DynamicVector<long unsigned int> Ant::getVisitedNodesAsVector()
+blaze::DynamicVector<long unsigned int> Ant::getSolutionAsVector()
 {
-  blaze::DynamicVector<long unsigned int> visitedNodesAsVector(visitedNodes.size());
+  blaze::DynamicVector<long unsigned int> visitedNodesAsVector(visitedNodes.size() + 1);
   for (long unsigned int i = 0; i < visitedNodes.size(); i++)
   {
     visitedNodesAsVector[i] = visitedNodes[i].getInternalId();
   }
+  visitedNodesAsVector[visitedNodesAsVector.size() - 1] = visitedNodesAsVector[0];
   return visitedNodesAsVector;
 }
 

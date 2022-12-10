@@ -5,6 +5,8 @@
 #include <sstream>
 #include <chrono>
 
+auto timeout = std::chrono::minutes{3}; // Timeout for the algorithm
+
 long unsigned int TSPStatement::getDimension() const
 {
     return dimension;
@@ -41,7 +43,7 @@ void TSPStatement::createDistanceMatrix()
             double y1 = nodes[i].getY();
             double x2 = nodes[j].getX();
             double y2 = nodes[j].getY();
-            double distance = sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
+            double distance = round(sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2)));
             distanceMatrix(i, j) = distance;
             distanceMatrix(j, i) = distance; // Symmetric matrix
         }
@@ -126,24 +128,18 @@ void TSPStatement::read(const char *filename)
     file.close();
 }
 
-void offlineUpdatePheromone(blaze::DynamicMatrix<double> &pheromoneMatrix, blaze::DynamicMatrix<double> &distanceMatrix, blaze::DynamicVector<long unsigned int> &visitedNodes)
+void offlineUpdatePheromone(blaze::DynamicMatrix<double> &pheromoneMatrix, blaze::DynamicMatrix<double> &distanceMatrix, blaze::DynamicVector<long unsigned int> &visitedNodes, double cost)
 {
-    // Calculate the length of the tour
-    double tourLength = 0;
-    for (long unsigned int i = 0; i < (visitedNodes.size() - 1); i++)
-    {
-        tourLength += distanceMatrix(visitedNodes[i], visitedNodes[i + 1]);
-    }
-
-    // Update the pheromone matrix
+    pheromoneMatrix = (1 - TSPConstants::rho) * pheromoneMatrix; // Evaporation in all edges
+    // Update the pheromone matrix to sum the edges of the best tour
     long unsigned int node1; // Will be written to in the first iteration
     long unsigned int node2 = visitedNodes[0];
     for (long unsigned int i = 1; i < visitedNodes.size(); i++)
     {
         node1 = node2; // node2 from the previous iteration
         node2 = visitedNodes[i];
-        // double newAmount = (1 - TSPConstants::rho) * pheromoneMatrix(node1, node2) + TSPConstants::rho / tourLength;
-        double newAmount = pheromoneMatrix(node1, node2) + 1.0 / tourLength;
+        double newAmount = pheromoneMatrix(node1, node2) + TSPConstants::rho / cost;
+        //double newAmount = pheromoneMatrix(node1, node2) + 1.0 / cost;
         pheromoneMatrix(node1, node2) = newAmount;
         pheromoneMatrix(node2, node1) = newAmount;
     }
@@ -155,8 +151,10 @@ void TSPStatement::solve_aco()
 
     // Parameters
     long unsigned int nAnts = 10;                                             // Number of ants
-    auto finish = std::chrono::system_clock::now() + std::chrono::minutes{3}; // Stop after 3 minutes
-    double deadlineInSeconds = std::chrono::duration<double>(std::chrono::minutes{3}).count();
+    auto finish = std::chrono::system_clock::now() + timeout; // Stop after 3 minutes
+    double deadlineInSeconds = std::chrono::duration<double>(timeout).count();
+
+    double exploitProbability = 0.2;
 
     // Initialize pheromone matrix
     long unsigned int dimension = getDimension();
@@ -169,12 +167,15 @@ void TSPStatement::solve_aco()
     // Main loop
     for (long unsigned int iteration = 0; std::chrono::system_clock::now() < finish; iteration++)
     {
-        // Print progress
-        // Only print progress every 100 iterations
-        if (iteration % 100 == 0)
+        if (iteration % 100 == 0) // Perform "expensive" updates every 100 iterations
         {
+            // Print progress
+            // Only print progress every 100 iterations
             double remainingSeconds = std::chrono::duration<double>(finish - std::chrono::system_clock::now()).count();
-            printProgress(1.0 - (remainingSeconds / deadlineInSeconds), name);
+            double percentage = 1.0 - (remainingSeconds / deadlineInSeconds);
+            printProgress(percentage, name);
+
+            exploitProbability = 0.3 + 0.4 * percentage; // Start with 30% exploitation, then increase to 70%
         }
 
         // Generate nAnts ants
@@ -200,7 +201,7 @@ void TSPStatement::solve_aco()
             {
                 // Move the ant
                 Ant &ant = ants[k];
-                ant.move(pheromone, distanceMatrix);
+                ant.move(pheromone, distanceMatrix, exploitProbability);
                 ant.localUpdatePheromone(pheromone);
             }
         }
@@ -209,23 +210,18 @@ void TSPStatement::solve_aco()
         for (long unsigned int j = 0; j < nAnts; j++)
         {
             Ant &ant = ants[j];
-            double cost = ant.getTourLength(distanceMatrix);
+            double cost = ant.getSolutionLength(distanceMatrix);
             if (cost < bestCost)
             {
                 bestCost = cost;
-                bestPath = ant.getVisitedNodesAsVector();
+                bestPath = ant.getSolutionAsVector();
 
-                // std::cout << std::endl
-                //           << "Iteration " << iteration << std::endl;
-                // std::cout << "Best cost: " << bestCost << std::endl;
-                // std::cout << "Best solution: " << bestPath << std::endl;
-                // std::cout << "Pheromone matrix: " << std::endl;
-                // std::cout << pheromone << std::endl;
+                std::cout << "\r" << std::endl << "[Iteration " << iteration << "] Best cost: " << bestCost << std::endl;
             }
         }
 
         // Offline pheromone update
-        offlineUpdatePheromone(pheromone, distanceMatrix, bestPath);
+        offlineUpdatePheromone(pheromone, distanceMatrix, bestPath, bestCost);
 
         // Print pheromone matrix
         // std::cout << "Pheromone matrix: " << std::endl;
@@ -243,7 +239,7 @@ long unsigned int TSPStatement::getBestKnown() const
     return bestKnown;
 }
 
-double TSPStatement::getBestCost() const
+int TSPStatement::getBestCost() const
 {
     return bestCost;
 }
