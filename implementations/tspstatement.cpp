@@ -4,23 +4,23 @@
 #include <fstream>
 #include <sstream>
 
-int TSPStatement::getDimension() const
+long unsigned int TSPStatement::getDimension() const
 {
     return dimension;
 }
 
-double TSPStatement::getDistance(int i, int j) const
+double TSPStatement::getDistance(long unsigned int i, long unsigned int j) const
 {
     return distanceMatrix(i, j);
 }
 
 void TSPStatement::createDistanceMatrix()
 {
-    int dimension = getDimension();
+    long unsigned int dimension = getDimension();
     distanceMatrix = blaze::DynamicMatrix<double>(dimension, dimension);
-    for (int i = 0; i < dimension; i++)
+    for (long unsigned int i = 0; i < dimension; i++)
     {
-        for (int j = 0; j < i; j++)
+        for (long unsigned int j = 0; j < i; j++)
         {
             // Calculate the Euclidean distance between nodes i and j
             double x1 = nodes[i].getX();
@@ -32,7 +32,7 @@ void TSPStatement::createDistanceMatrix()
             distanceMatrix(j, i) = distance; // Symmetric matrix
         }
     }
-    for (int i = 0; i < dimension; i++)
+    for (long unsigned int i = 0; i < dimension; i++)
     {
         distanceMatrix(i, i) = 0; // Diagonal is 0
     }
@@ -93,7 +93,7 @@ void TSPStatement::read(const char *filename)
         std::istringstream iss(line);
         std::string word;
         iss >> word;
-        int i = std::stoi(word);
+        long unsigned int i = std::stoi(word);
         iss >> word;
         double x = std::stod(word);
         iss >> word;
@@ -112,6 +112,29 @@ void TSPStatement::read(const char *filename)
     file.close();
 }
 
+void offlineUpdatePheromone(blaze::DynamicMatrix<double> &pheromoneMatrix, blaze::DynamicMatrix<double> &distanceMatrix, blaze::DynamicVector<int> &visitedNodes)
+{
+    // Calculate the length of the tour
+    double tourLength = 0;
+    for (long unsigned int i = 0; i < (visitedNodes.size() - 1); i++)
+    {
+        tourLength += distanceMatrix(visitedNodes[i], visitedNodes[i + 1]);
+    }
+
+    // Update the pheromone matrix
+    long unsigned int node1; // Will be written to in the first iteration
+    long unsigned int node2 = visitedNodes[0];
+    for (long unsigned int i = 1; i < visitedNodes.size(); i++)
+    {
+        node1 = node2; // node2 from the previous iteration
+        node2 = visitedNodes[i];
+        // double newAmount = (1 - TSPConstants::rho) * pheromoneMatrix(node1, node2) + TSPConstants::rho / tourLength;
+        double newAmount = pheromoneMatrix(node1, node2) + 1.0 / tourLength;
+        pheromoneMatrix(node1, node2) = newAmount;
+        pheromoneMatrix(node2, node1) = newAmount;
+    }
+}
+
 void TSPStatement::solve_aco()
 {
     // Solution using the Ant Colony Optimization algorithm
@@ -121,14 +144,14 @@ void TSPStatement::solve_aco()
     std::cout << distanceMatrix << std::endl;
 
     // Parameters
-    int nAnts = 2;        // Number of ants
-    int nIterations = 5; // Number of iterations
+    long unsigned int nAnts = 10;           // Number of ants
+    long unsigned int nIterations = 100000; // Number of iterations
 
     // Initialize pheromone matrix
-    int dimension = getDimension();
+    long unsigned int dimension = getDimension();
     double tau = TSPConstants::tau0;
     blaze::DynamicMatrix<double> pheromone(dimension, dimension, tau); // All elements are tau0, even the diagonal, but it doesn't matter (it will never be used)
-    
+
     // Initialize best solution
     blaze::DynamicVector<int> bestSolution(dimension);
     double bestCost = std::numeric_limits<double>::max();
@@ -137,15 +160,14 @@ void TSPStatement::solve_aco()
     // Randomly position nAnts artificial ants on nNodes nodes
     std::vector<Ant> ants;
     // Main loop
-    for (int i = 0; i < nIterations; i++)
+    for (long unsigned int i = 0; i < nIterations; i++)
     {
-        std::cout << std::endl << "Iteration " << i << std::endl;
         // Generate nAnts ants
         ants.clear();
-        for (int i = 0; i < nAnts; i++)
+        for (long unsigned int i = 0; i < nAnts; i++)
         {
             // Choose a random node
-            int node = rand() % dimension;
+            long unsigned int node = rand() % dimension;
             Node n = nodes[node];
 
             // Create an ant on that node
@@ -156,10 +178,10 @@ void TSPStatement::solve_aco()
 
         // Construct solutions
         // Visit all nodes
-        for (int j = 0; j < dimension - 1; j++)
+        for (long unsigned int j = 0; j < dimension - 1; j++)
         {
             // For each ant
-            for (int k = 0; k < nAnts; k++)
+            for (long unsigned int k = 0; k < nAnts; k++)
             {
                 // Move the ant
                 Ant &ant = ants[k];
@@ -169,7 +191,7 @@ void TSPStatement::solve_aco()
         }
 
         // Update best solution
-        for (int j = 0; j < nAnts; j++)
+        for (long unsigned int j = 0; j < nAnts; j++)
         {
             Ant &ant = ants[j];
             double cost = ant.getTourLength(distanceMatrix);
@@ -177,17 +199,24 @@ void TSPStatement::solve_aco()
             {
                 bestCost = cost;
                 bestSolution = ant.getVisitedNodesAsVector();
+
+                std::cout << std::endl
+                          << "Iteration " << i << std::endl;
+                std::cout << "Best cost: " << bestCost << std::endl;
+                std::cout << "Best solution: " << bestSolution << std::endl;
+                std::cout << "Pheromone matrix: " << std::endl;
+                std::cout << pheromone << std::endl;
             }
         }
 
         // Offline pheromone update
-        
-
-        std::cout << "Best cost: " << bestCost << std::endl;
-        std::cout << "Best solution: " << bestSolution << std::endl;
+        offlineUpdatePheromone(pheromone, distanceMatrix, bestSolution);
 
         // Print pheromone matrix
-        std::cout << "Pheromone matrix: " << std::endl;
-        std::cout << pheromone << std::endl;
+        // std::cout << "Pheromone matrix: " << std::endl;
+        // std::cout << pheromone << std::endl;
     }
+
+    std::cout << "Best cost: " << bestCost << std::endl;
+    std::cout << "Best solution: " << bestSolution << std::endl;
 }

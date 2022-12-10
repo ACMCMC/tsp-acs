@@ -1,22 +1,22 @@
 [
 {
   "directory": "/home/acmc/repos/usi-ai/build",
-  "command": "/usr/bin/c++    -g   -o CMakeFiles/tsp.dir/implementations/ant.cpp.o -c /home/acmc/repos/usi-ai/implementations/ant.cpp",
+  "command": "/usr/bin/c++    -Wall -Wextra -g   -o CMakeFiles/tsp.dir/implementations/ant.cpp.o -c /home/acmc/repos/usi-ai/implementations/ant.cpp",
   "file": "/home/acmc/repos/usi-ai/implementations/ant.cpp"
 },
 {
   "directory": "/home/acmc/repos/usi-ai/build",
-  "command": "/usr/bin/c++    -g   -o CMakeFiles/tsp.dir/implementations/main.cpp.o -c /home/acmc/repos/usi-ai/implementations/main.cpp",
+  "command": "/usr/bin/c++    -Wall -Wextra -g   -o CMakeFiles/tsp.dir/implementations/main.cpp.o -c /home/acmc/repos/usi-ai/implementations/main.cpp",
   "file": "/home/acmc/repos/usi-ai/implementations/main.cpp"
 },
 {
   "directory": "/home/acmc/repos/usi-ai/build",
-  "command": "/usr/bin/c++    -g   -o CMakeFiles/tsp.dir/implementations/node.cpp.o -c /home/acmc/repos/usi-ai/implementations/node.cpp",
+  "command": "/usr/bin/c++    -Wall -Wextra -g   -o CMakeFiles/tsp.dir/implementations/node.cpp.o -c /home/acmc/repos/usi-ai/implementations/node.cpp",
   "file": "/home/acmc/repos/usi-ai/implementations/node.cpp"
 },
 {
   "directory": "/home/acmc/repos/usi-ai/build",
-  "command": "/usr/bin/c++    -g   -o CMakeFiles/tsp.dir/implementations/tspstatement.cpp.o -c /home/acmc/repos/usi-ai/implementations/tspstatement.cpp",
+  "command": "/usr/bin/c++    -Wall -Wextra -g   -o CMakeFiles/tsp.dir/implementations/tspstatement.cpp.o -c /home/acmc/repos/usi-ai/implementations/tspstatement.cpp",
   "file": "/home/acmc/repos/usi-ai/implementations/tspstatement.cpp"
 }
 ]

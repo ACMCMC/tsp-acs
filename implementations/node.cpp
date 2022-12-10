@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-Node::Node(int id, double x, double y)
+Node::Node(long unsigned int id, double x, double y)
 {
     this->id = id - 1;
     this->x = x;
@@ -16,11 +16,11 @@ double Node::getY() const
 {
     return y;
 }
-int Node::getInternalId() const
+long unsigned int Node::getInternalId() const
 {
     return id;
 }
-int Node::getHumanId() const
+long unsigned int Node::getHumanId() const
 {
     return id + 1;
 }
@@ -31,5 +31,5 @@ int Node::getHumanId() const
  */
 Node::~Node()
 {
-    std::cout << "Node " << id << " destroyed" << std::endl;
+    //std::cout << "Node " << id << " destroyed" << std::endl;
 }
