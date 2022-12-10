@@ -4,5 +4,6 @@
     "*.h": "c",
     "*.c": "c",
     "iosfwd": "cpp"
-  }
+  },
+  "cmake.configureOnOpen": true
 }

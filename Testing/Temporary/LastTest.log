@@ -1,0 +1,18 @@
+Start testing: Dec 08 13:55 CET
+----------------------------------------------------------
+1/1 Testing: tsp_test
+1/1 Test: tsp_test
+Command: "/home/acmc/repos/usi-ai/tests/tsp_tests"
+Directory: /home/acmc/repos/usi-ai/tests
+"tsp_test" start time: Dec 08 13:55 CET
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Failed.
+"tsp_test" end time: Dec 08 13:55 CET
+"tsp_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Dec 08 13:55 CET

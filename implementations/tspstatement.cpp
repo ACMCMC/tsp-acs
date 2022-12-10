@@ -4,36 +4,6 @@
 #include <fstream>
 #include <sstream>
 
-/*
-NAME: ch130
-TYPE: TSP
-COMMENT: 130 city problem (Churritz)
-DIMENSION: 130
-EDGE_WEIGHT_TYPE: EUC_2D
-BEST_KNOWN : 6110
-NODE_COORD_SECTION
-1 334.5909245845 161.7809319139
-*/
-
-TSPStatement::Node::Node(int id, double x, double y)
-{
-    this->id = id;
-    this->x = x;
-    this->y = y;
-}
-double TSPStatement::Node::getX() const
-{
-    return x;
-}
-double TSPStatement::Node::getY() const
-{
-    return y;
-}
-int TSPStatement::Node::getId() const
-{
-    return id;
-}
-
 int TSPStatement::getDimension() const
 {
     return dimension;
@@ -140,4 +110,84 @@ void TSPStatement::read(const char *filename)
     std::cout << "Distance matrix: " << distanceMatrix.rows() << "x" << distanceMatrix.columns() << std::endl;
 
     file.close();
+}
+
+void TSPStatement::solve_aco()
+{
+    // Solution using the Ant Colony Optimization algorithm
+
+    // Print distance matrix
+    std::cout << "Distance matrix:" << std::endl;
+    std::cout << distanceMatrix << std::endl;
+
+    // Parameters
+    int nAnts = 2;        // Number of ants
+    int nIterations = 5; // Number of iterations
+
+    // Initialize pheromone matrix
+    int dimension = getDimension();
+    double tau = TSPConstants::tau0;
+    blaze::DynamicMatrix<double> pheromone(dimension, dimension, tau); // All elements are tau0, even the diagonal, but it doesn't matter (it will never be used)
+    
+    // Initialize best solution
+    blaze::DynamicVector<int> bestSolution(dimension);
+    double bestCost = std::numeric_limits<double>::max();
+
+    // Initialize ants
+    // Randomly position nAnts artificial ants on nNodes nodes
+    std::vector<Ant> ants;
+    // Main loop
+    for (int i = 0; i < nIterations; i++)
+    {
+        std::cout << std::endl << "Iteration " << i << std::endl;
+        // Generate nAnts ants
+        ants.clear();
+        for (int i = 0; i < nAnts; i++)
+        {
+            // Choose a random node
+            int node = rand() % dimension;
+            Node n = nodes[node];
+
+            // Create an ant on that node
+            Ant ant(n, nodes);
+            // Add the ant to the ant list
+            ants.push_back(Ant(n, nodes));
+        }
+
+        // Construct solutions
+        // Visit all nodes
+        for (int j = 0; j < dimension - 1; j++)
+        {
+            // For each ant
+            for (int k = 0; k < nAnts; k++)
+            {
+                // Move the ant
+                Ant &ant = ants[k];
+                ant.move(pheromone, distanceMatrix);
+                ant.localUpdatePheromone(pheromone);
+            }
+        }
+
+        // Update best solution
+        for (int j = 0; j < nAnts; j++)
+        {
+            Ant &ant = ants[j];
+            double cost = ant.getTourLength(distanceMatrix);
+            if (cost < bestCost)
+            {
+                bestCost = cost;
+                bestSolution = ant.getVisitedNodesAsVector();
+            }
+        }
+
+        // Offline pheromone update
+        
+
+        std::cout << "Best cost: " << bestCost << std::endl;
+        std::cout << "Best solution: " << bestSolution << std::endl;
+
+        // Print pheromone matrix
+        std::cout << "Pheromone matrix: " << std::endl;
+        std::cout << pheromone << std::endl;
+    }
 }

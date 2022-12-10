@@ -14,7 +14,10 @@ int main(int argc, char** argv) {
     std::cout << "Reading file: " << argv[1] << std::endl;
 
     statement.read(argv[1]);
-    //std::cout << statement.getDimension() << std::endl;
-    //std::cout << statement.getDistance(0, 1) << std::endl;
+
+    srand(1); // Set the seed for the random number generator. This is so that the results are reproducible.
+
+    statement.solve_aco();
+
     return 0;
 }

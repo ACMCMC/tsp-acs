@@ -9,7 +9,7 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/tsp",
-      "args": ["./problems/ch130.tsp"],
+      "args": ["./problems/my_test.tsp"],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],

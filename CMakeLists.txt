@@ -10,3 +10,6 @@ file(GLOB SOURCES
 )
 
 add_executable(tsp ${SOURCES})
+
+enable_testing()
+#add_subdirectory(tests)
