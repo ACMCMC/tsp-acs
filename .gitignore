@@ -2,5 +2,11 @@ cmake_install.cmake
 CMakeFiles
 Makefile
 blaze-3.5
-tsp
 CMakeCache.txt
+build
+CMakeFiles
+tsp
+tsp_run
+tsp_lib
+Testing
+libtsp_lib.a
