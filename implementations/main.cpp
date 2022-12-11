@@ -3,8 +3,8 @@
 #include <fstream>
 #include <sstream>
 
-double TSPConstants::alpha = 1;
-double TSPConstants::beta = 5;
+double TSPConstants::alpha = 8.95666582;
+double TSPConstants::beta = 8.95666582;
 
 int main(int argc, char **argv)
 {
@@ -33,12 +33,13 @@ int main(int argc, char **argv)
     statement.solve_aco();
 
     std::cout << "Best path found: " << statement.getBestPath() << std::endl;
-    std::cout << "Cost difference: " << (statement.getBestCost() - ((double) statement.getBestKnown())) / ((double) statement.getBestKnown()) << std::endl;
+    double costDiff = (std::floor(statement.getBestCost()) - ((double) statement.getBestKnown())) / ((double) statement.getBestKnown());
+    std::cout << "Cost difference: " << costDiff << std::endl;
 
     // Append the result to the results file
     std::ofstream resultsFile;
     resultsFile.open((argc > 2 ? argv[2] : "results.csv"), std::ios_base::app); // if no output file is specified, use results.csv
-    resultsFile << statement.getName() << "," << std::floor(statement.getBestCost()) << std::endl;
+    resultsFile << statement.getName() << "," << std::floor(statement.getBestCost()) << "," << costDiff << std::endl;
     resultsFile.close();
 
     return 0;

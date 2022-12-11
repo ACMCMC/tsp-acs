@@ -10,10 +10,13 @@ class TSPConstants {
 public:
     static constexpr double rho = 0.1;      // Evaporation rate
     static constexpr double phi = 0.1;      // Pheromone decay rate
-    static constexpr double tau0 = 1;       // Initial pheromone
+    static constexpr double tau0 = 0.5;       // Initial pheromone
+    static constexpr double minPheromone = 0.25;       // Minimum pheromone value
+    static constexpr double maxPheromone = 1.5;       // Maximum pheromone value
     static double alpha;      // Importance of pheromone
     static double beta;       // Importance of distance
-    static constexpr auto timeout = std::chrono::seconds{5}; // Timeout for the algorithm
+    static constexpr auto timeout = std::chrono::minutes{3}; // Timeout for the algorithm
+    static constexpr int localSearchEnabled = 1; // Enable local search
 };
 
 class Node
@@ -43,6 +46,7 @@ public:
     int getBestCost() const;
     std::string getName() const;
     blaze::DynamicVector<long unsigned int, false> getBestPath() const;
+    void localSearch3Opt();
 private:
     long unsigned int dimension;
     std::string name;
@@ -61,7 +65,7 @@ class Ant
 public:
     Ant(Node& start, std::vector<Node> nodes);
     ~Ant();
-    void move(blaze::DynamicMatrix<double> &pheromoneMatrix,blaze::DynamicMatrix<double> &distanceMatrix, double exploitProbability);
+    void move(blaze::DynamicMatrix<double> &precalculatedTargetMatrix, double exploitProbability);
     void offlineUpdatePheromone(blaze::DynamicMatrix<double> &pheromoneMatrix, blaze::DynamicMatrix<double> &distanceMatrix);
     void localUpdatePheromone(blaze::DynamicMatrix<double> &pheromoneMatrix);
     int getSolutionLength(blaze::DynamicMatrix<double> &distanceMatrix);
