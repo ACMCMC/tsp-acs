@@ -18,7 +18,7 @@ def process_problem(data):
     results_file = "python_result_{}.opt.tour".format(problem_name) # So it will be renamed to this.
     with open("out_{}".format(problem_name), "w") as f:
         p = subprocess.Popen(["./implementations/tsp_run", data["problem"], program_arg_results_file, str(
-            data["alpha"]), str(data["beta"]), str(data["rho"]), str(data["phi"]), str(data["tau0"])], stdout=f)
+            data["alpha"]), str(data["beta"]), str(data["rho"]), str(data["phi"]), str(data["tau0"]), str(data["nAnts"])], stdout=f)
         p.wait()
     #print(f"Finished processing {data[0]}")
     return_val = 0.0
@@ -33,7 +33,7 @@ def process_problem(data):
     return return_val
 
 
-def program(alpha, beta, rho, phi, tau0):
+def program(nAnts):
     # Create an empty file to store the result. If it exists, it will be overwritten.
     open("python_result.tmp", "w").close()
     #p = subprocess.Popen(["parallel", "./implementations/tsp_run", "{}", "python_result.tmp", str(alpha), str(beta), ":::", ], stdout = subprocess.PIPE)
@@ -44,7 +44,7 @@ def program(alpha, beta, rho, phi, tau0):
     #processes = [subprocess.Popen(["./implementations/tsp_run", p, "python_result.tmp", str(alpha), str(beta)]) for p in problems]
     #[p.wait() for p in processes]
     values = pool.map(process_problem, [{'problem': p, 'alpha': alpha, 'beta': beta,
-             'rho': rho, 'phi': phi, 'tau0': tau0} for p in problems])
+             'rho': rho, 'phi': phi, 'tau0': tau0, 'nAnts': round(nAnts)} for p in problems])
     #print("Finished all problems.")
     average = sum(values) / float(len(values))
     return 1.0 / average  # Convert to a maximization problem.
@@ -60,6 +60,9 @@ pbounds = {
     "rho": [1e-10, 0.1],
     "phi": [1e-10, 0.1],
     "tau0": [0, 1.5],
+}
+pbounds = {
+    "nAnts": [5, 100],
 }
 
 # Create a BayesianOptimization optimizer,

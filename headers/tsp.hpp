@@ -11,8 +11,9 @@ public:
     static double rho;      // Evaporation rate
     static double phi;      // Pheromone decay rate
     static double tau0;       // Initial pheromone
-    static constexpr double minPheromone = 0;       // Minimum pheromone value
+    static constexpr double minPheromone = 10e-10;       // Minimum pheromone value
     static constexpr double maxPheromone = 1.5;       // Maximum pheromone value
+    static long unsigned int nAnts;      // Number of ants
     static double alpha;      // Importance of pheromone
     static double beta;       // Importance of distance
     static constexpr auto timeout = std::chrono::minutes{3}; // Timeout for the algorithm

@@ -159,7 +159,6 @@ void TSPStatement::solve_aco()
     // Solution using the Ant Colony Optimization algorithm
 
     // Parameters
-    long unsigned int nAnts = 10;                                             // Number of ants
     auto timeout = TSPConstants::timeout; // Timeout for the algorithm
     auto finish = std::chrono::system_clock::now() + timeout; // Stop after 3 minutes
     double deadlineInSeconds = std::chrono::duration<double>(timeout).count();
@@ -195,7 +194,7 @@ void TSPStatement::solve_aco()
 
         // Generate nAnts ants
         ants.clear();
-        for (long unsigned int j = 0; j < nAnts; j++)
+        for (long unsigned int j = 0; j < TSPConstants::nAnts; j++)
         {
             // Choose a random node
             long unsigned int node = rand() % dimension;
@@ -215,7 +214,7 @@ void TSPStatement::solve_aco()
         for (long unsigned int j = 0; j < dimension - 1; j++)
         {
             // For each ant
-            for (long unsigned int k = 0; k < nAnts; k++)
+            for (long unsigned int k = 0; k < TSPConstants::nAnts; k++)
             {
                 // Move the ant
                 Ant &ant = ants[k];
@@ -227,7 +226,7 @@ void TSPStatement::solve_aco()
         int isThereANewBest = 0; // 0 = no, 1 = yes
 
         // Update best solution
-        for (long unsigned int j = 0; j < nAnts; j++)
+        for (long unsigned int j = 0; j < TSPConstants::nAnts; j++)
         {
             Ant &ant = ants[j];
             double cost = ant.getSolutionLength(distanceMatrix);
@@ -368,7 +367,7 @@ void TSPStatement::writeSolution(const char* filename) {
     std::string filenameString(filename);
     std::string filenameWithoutExtension = filenameString.substr(0, filenameString.find_last_of("."));
     std::string filenameWithExtension = filenameWithoutExtension + ".opt.tour";
-    resultsFile.open(filenameWithExtension, std::ios_base::app); // if no output file is specified, use results.csv
+    resultsFile.open(filenameWithExtension, std::ios_base::out); // if no output file is specified, use results.csv
     resultsFile << "NAME : " << getName() << std::endl;
     resultsFile << "COMMENT : " << comment << std::endl;
     resultsFile << "TYPE : TOUR" << std::endl;
