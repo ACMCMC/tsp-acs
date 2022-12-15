@@ -11,6 +11,17 @@
               "&&",
               "make",
             ]
+        },
+        {
+            "label": "Build Release",
+            "type": "shell",
+            "command": [
+              "cmake -DCMAKE_BUILD_TYPE=Release .",
+              "&&",
+              "cmake --build .",
+              "&&",
+              "make",
+            ]
         }
     ]
 }

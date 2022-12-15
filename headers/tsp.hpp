@@ -8,10 +8,10 @@
 
 class TSPConstants {
 public:
-    static constexpr double rho = 0.1;      // Evaporation rate
-    static constexpr double phi = 0.1;      // Pheromone decay rate
-    static constexpr double tau0 = 0.5;       // Initial pheromone
-    static constexpr double minPheromone = 0.25;       // Minimum pheromone value
+    static double rho;      // Evaporation rate
+    static double phi;      // Pheromone decay rate
+    static double tau0;       // Initial pheromone
+    static constexpr double minPheromone = 0;       // Minimum pheromone value
     static constexpr double maxPheromone = 1.5;       // Maximum pheromone value
     static double alpha;      // Importance of pheromone
     static double beta;       // Importance of distance
@@ -47,9 +47,11 @@ public:
     std::string getName() const;
     blaze::DynamicVector<long unsigned int, false> getBestPath() const;
     void localSearch3Opt();
+    void writeSolution(const char* filename);
 private:
     long unsigned int dimension;
     std::string name;
+    std::string comment;
     long unsigned int bestKnown;
     blaze::DynamicMatrix<double> distanceMatrix;
     std::vector<Node> nodes;
