@@ -6,5 +6,6 @@
     "iosfwd": "cpp"
   },
   "cmake.configureOnOpen": true,
-  "python.analysis.typeCheckingMode": "basic"
+  "python.analysis.typeCheckingMode": "basic",
+  "cmake.sourceDirectory": "${workspaceFolder}/."
 }

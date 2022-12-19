@@ -76,6 +76,15 @@ void TSPStatement::read(const char *filename)
             }
             name = word;
         }
+        if (line.find("COMMENT") != std::string::npos)
+        {
+            iss >> word >> word;
+            if (word == ":") // if there is a colon, read the next word
+            {
+                iss >> word;
+            }
+            comment = word;
+        }
         if (line.find("BEST_KNOWN") != std::string::npos)
         {
             iss >> word >> word;
@@ -137,6 +146,7 @@ void offlineUpdatePheromone(blaze::DynamicMatrix<double> &pheromoneMatrix, blaze
         node1 = node2; // node2 from the previous iteration
         node2 = visitedNodes[i];
         double newAmount = pheromoneMatrix(node1, node2) + (TSPConstants::rho * pow(distanceMatrix.rows(), 3)) / cost; // rho * n / cost (temporal fix)
+        //double newAmount = pheromoneMatrix(node1, node2) + (TSPConstants::rho) / cost;
         // double newAmount = pheromoneMatrix(node1, node2) + 1.0 / cost;
         pheromoneMatrix(node1, node2) = newAmount;
         pheromoneMatrix(node2, node1) = newAmount;
@@ -148,12 +158,11 @@ void TSPStatement::solve_aco()
     // Solution using the Ant Colony Optimization algorithm
 
     // Parameters
-    long unsigned int nAnts = 10;                             // Number of ants
-    auto timeout = TSPConstants::timeout;                     // Timeout for the algorithm
+    auto timeout = TSPConstants::timeout; // Timeout for the algorithm
     auto finish = std::chrono::system_clock::now() + timeout; // Stop after 3 minutes
     double deadlineInSeconds = std::chrono::duration<double>(timeout).count();
 
-    double exploitProbability = 0.2;
+    double exploitProbability = 0.3;
 
     // Initialize pheromone matrix
     long unsigned int dimension = getDimension();
@@ -184,7 +193,7 @@ void TSPStatement::solve_aco()
 
         // Generate nAnts ants
         ants.clear();
-        for (long unsigned int j = 0; j < nAnts; j++)
+        for (long unsigned int j = 0; j < TSPConstants::nAnts; j++)
         {
             // Choose a random node
             long unsigned int node = rand() % dimension;
@@ -204,7 +213,7 @@ void TSPStatement::solve_aco()
         for (long unsigned int j = 0; j < dimension - 1; j++)
         {
             // For each ant
-            for (long unsigned int k = 0; k < nAnts; k++)
+            for (long unsigned int k = 0; k < TSPConstants::nAnts; k++)
             {
                 // Move the ant
                 Ant &ant = ants[k];
@@ -216,7 +225,7 @@ void TSPStatement::solve_aco()
         int isThereANewBest = 0; // 0 = no, 1 = yes
 
         // Update best solution
-        for (long unsigned int j = 0; j < nAnts; j++)
+        for (long unsigned int j = 0; j < TSPConstants::nAnts; j++)
         {
             Ant &ant = ants[j];
             double cost = ant.getSolutionLength(distanceMatrix);
@@ -442,4 +451,28 @@ int TSPStatement::getBestCost() const
 std::string TSPStatement::getName() const
 {
     return name;
+}
+    
+void TSPStatement::writeSolution(const char* filename) {
+    double costDiff = (std::floor(getBestCost()) - ((double) getBestKnown())) / ((double) getBestKnown());
+
+    std::ofstream resultsFile;
+    // The filename was "./problems/eil76.tsp", so we want to write the results to "./problems/eil76.opt.tour"
+    std::string filenameString(filename);
+    std::string filenameWithoutExtension = filenameString.substr(0, filenameString.find_last_of("."));
+    std::string filenameWithExtension = filenameWithoutExtension + ".opt.tour";
+    resultsFile.open(filenameWithExtension, std::ios_base::out); // if no output file is specified, use results.csv
+    resultsFile << "NAME : " << getName() << std::endl;
+    resultsFile << "COMMENT : " << comment << std::endl;
+    resultsFile << "TYPE : TOUR" << std::endl;
+    resultsFile << "DIMENSION : " << dimension << std::endl;
+    resultsFile << "TOUR_LENGTH : " << getBestCost() << std::endl;
+    resultsFile << "ERROR : " << costDiff << std::endl;
+    resultsFile << "TOUR_SECTION" << std::endl;
+    for (unsigned long int i = 0; i < getBestPath().size() - 1; i++) {
+        resultsFile << getBestPath()[i] << std::endl;
+    }
+    resultsFile << "-1" << std::endl;
+    resultsFile << "EOF" << std::endl;
+    resultsFile.close();
 }
