@@ -5,7 +5,6 @@
 #include <sstream>
 #include <chrono>
 
-
 long unsigned int TSPStatement::getDimension() const
 {
     return dimension;
@@ -138,7 +137,7 @@ void offlineUpdatePheromone(blaze::DynamicMatrix<double> &pheromoneMatrix, blaze
         node1 = node2; // node2 from the previous iteration
         node2 = visitedNodes[i];
         double newAmount = pheromoneMatrix(node1, node2) + (TSPConstants::rho * pow(distanceMatrix.rows(), 3)) / cost; // rho * n / cost (temporal fix)
-        //double newAmount = pheromoneMatrix(node1, node2) + 1.0 / cost;
+        // double newAmount = pheromoneMatrix(node1, node2) + 1.0 / cost;
         pheromoneMatrix(node1, node2) = newAmount;
         pheromoneMatrix(node2, node1) = newAmount;
     }
@@ -149,8 +148,8 @@ void TSPStatement::solve_aco()
     // Solution using the Ant Colony Optimization algorithm
 
     // Parameters
-    long unsigned int nAnts = 10;                                             // Number of ants
-    auto timeout = TSPConstants::timeout; // Timeout for the algorithm
+    long unsigned int nAnts = 10;                             // Number of ants
+    auto timeout = TSPConstants::timeout;                     // Timeout for the algorithm
     auto finish = std::chrono::system_clock::now() + timeout; // Stop after 3 minutes
     double deadlineInSeconds = std::chrono::duration<double>(timeout).count();
 
@@ -164,7 +163,7 @@ void TSPStatement::solve_aco()
     blaze::DynamicMatrix<double> pheromone(dimension, dimension, tau0); // All elements are tau0, even the diagonal, but it doesn't matter (it will never be used)
 
     // Utility matrix
-    blaze::DynamicMatrix<double> inverseDistanceMatrix = blaze::pow(distanceMatrix, -1);                         // All elements are 1/distance
+    blaze::DynamicMatrix<double> inverseDistanceMatrix = blaze::pow(distanceMatrix, -1); // All elements are 1/distance
 
     // Initialize ants
     // Randomly position nAnts artificial ants on nNodes nodes
@@ -173,7 +172,7 @@ void TSPStatement::solve_aco()
     for (long unsigned int iteration = 0; std::chrono::system_clock::now() < finish; iteration++)
     {
         // Perform "expensive" updates every 25 iterations
-        if (iteration % 25 == 0) 
+        if (iteration % 25 == 0)
         {
             // Print progress
             double remainingSeconds = std::chrono::duration<double>(finish - std::chrono::system_clock::now()).count();
@@ -227,12 +226,15 @@ void TSPStatement::solve_aco()
                 bestPath = ant.getSolutionAsVector();
                 isThereANewBest = 1;
 
-                std::cout << "\r" << std::endl << "[Iteration " << iteration << "] Best cost: " << bestCost << std::endl;
+                std::cout << "\r" << std::endl
+                          << "[Iteration " << iteration << "] Best cost: " << bestCost << std::endl;
             }
         }
 
-        if (TSPConstants::localSearchEnabled && isThereANewBest) {
+        if (TSPConstants::localSearchEnabled && isThereANewBest)
+        {
             // Local search only if there is a new best solution
+            localSearch2Opt();
             localSearch3Opt();
         }
 
@@ -248,7 +250,91 @@ void TSPStatement::solve_aco()
     }
 }
 
-void TSPStatement::localSearch3Opt() {
+void TSPStatement::localSearch2Opt()
+{
+    // 2-opt local search
+
+    /*blaze::DynamicVector<long unsigned int> testPath(8);
+    testPath[0] = 0;
+    testPath[1] = 1;
+    testPath[2] = 2;
+    testPath[3] = 3;
+    testPath[4] = 4;
+    testPath[5] = 5;
+    testPath[6] = 6;
+    testPath[7] = 7;
+    int i = 1;
+    int j = 5;
+            long unsigned int a = i;
+            long unsigned int b = i + 1;
+            long unsigned int c = j;
+            long unsigned int d = j + 1 % testPath.size();
+    blaze::DynamicVector<long unsigned int> newPath(8);
+                // Copy the first part of the path
+                for (long unsigned int l = 0; l <= a; l++)
+                {
+                    newPath[l] = testPath[l];
+                }
+                // Copy the second part of the path, from c to b, reversed
+                for (long unsigned int l = 0; l <= (c - b); l++)
+                {
+                    newPath[(a + 1) + l] = testPath[(c - l)];
+                }
+                // Copy the last part of the path
+                for (long unsigned int l = d; l < testPath.size(); l++)
+                {
+                    newPath[l] = testPath[l];
+                }
+                    std::cout << "New path: " << newPath << std::endl;*/
+
+    for (long unsigned int i = 0; i < bestPath.size() - 2; i++)
+    {
+        for (long unsigned int j = i + 2; j < bestPath.size(); j++)
+        {
+            // Calculate the gain of the swap
+            double gain = 0;
+            long unsigned int a = i;
+            long unsigned int b = i + 1;
+            long unsigned int c = j;
+            long unsigned int d = j + 1 % bestPath.size();
+            gain += distanceMatrix(bestPath[a], bestPath[c]);
+            gain += distanceMatrix(bestPath[b], bestPath[d]);
+            gain -= distanceMatrix(bestPath[c], bestPath[d]);
+            gain -= distanceMatrix(bestPath[a], bestPath[b]);
+
+            // If the gain is negative, perform the swap
+            if (gain < 0)
+            {
+                // Perform the swap: the path becomes bestPath[a] -> bestPath[c] ... (reversed) bestPath[b] -> bestPath[d] ...
+                blaze::DynamicVector<long unsigned int> newPath(bestPath.size());
+                // Copy the first part of the path
+                for (long unsigned int l = 0; l <= a; l++)
+                {
+                    newPath[l] = bestPath[l];
+                }
+                // Copy the second part of the path, from c to b, reversed
+                for (long unsigned int l = 0; l <= (c - b); l++)
+                {
+                    newPath[(a + 1) + l] = bestPath[(c - l)];
+                }
+                // Copy the last part of the path
+                for (long unsigned int l = d; l < bestPath.size(); l++)
+                {
+                    newPath[l] = bestPath[l];
+                }
+
+                // Update the best cost
+                bestCost += gain;
+
+                // Update the best path
+                bestPath = newPath;
+            }
+        }
+    }
+};
+
+void TSPStatement::localSearch3Opt()
+{
     // 3-opt local search
     /*blaze::DynamicVector<long unsigned int> testPath(14);
     testPath[0] = 0;
@@ -286,9 +372,12 @@ void TSPStatement::localSearch3Opt() {
                     }
                     std::cout << "New path: " << newPath << std::endl;*/
 
-    for (long unsigned int i = 0; i < bestPath.size() - 3; i++) {
-        for (long unsigned int j = i + 2; j < bestPath.size() - 1; j++) {
-            for (long unsigned int k = j + 2; k < bestPath.size(); k++) {
+    for (long unsigned int i = 0; i < bestPath.size() - 3; i++)
+    {
+        for (long unsigned int j = i + 2; j < bestPath.size() - 1; j++)
+        {
+            for (long unsigned int k = j + 2; k < bestPath.size(); k++)
+            {
                 // Calculate the gain of the swap
                 double gain = 0;
                 gain += distanceMatrix(bestPath[i], bestPath[j + 1]);
@@ -299,23 +388,28 @@ void TSPStatement::localSearch3Opt() {
                 gain -= distanceMatrix(bestPath[k], bestPath[(k + 1) % bestPath.size()]);
 
                 // If the gain is negative, perform the swap
-                if (gain < 0) {
+                if (gain < 0)
+                {
                     // Perform the swap: the path becomes bestPath[i] -> bestPath[j + 1] ... bestPath[k] -> bestPath[i+1] ... bestPath[j] -> bestPath[k+1] ...
                     blaze::DynamicVector<long unsigned int> newPath(bestPath.size());
                     // Copy the first part of the path
-                    for (long unsigned int l = 0; l <= i; l++) {
+                    for (long unsigned int l = 0; l <= i; l++)
+                    {
                         newPath[l] = bestPath[l];
                     }
                     // Copy the second part of the path, from j + 1 to k
-                    for (long unsigned int l = 0; l <= (k - (j + 1)); l++) {
+                    for (long unsigned int l = 0; l <= (k - (j + 1)); l++)
+                    {
                         newPath[(i + 1) + l] = bestPath[(j + 1) + l];
                     }
                     // Copy the third part of the path, from i + 1 to j
-                    for (long unsigned int l = 0; l <= (j - (i + 1)); l++) {
+                    for (long unsigned int l = 0; l <= (j - (i + 1)); l++)
+                    {
                         newPath[(i + 1) + (k - (j + 1)) + 1 + l] = bestPath[(i + 1) + l];
                     }
                     // newPath[k + 1] = bestPath[k + 1];
-                    for (long unsigned int l = k + 1; l < bestPath.size(); l++) {
+                    for (long unsigned int l = k + 1; l < bestPath.size(); l++)
+                    {
                         newPath[l] = bestPath[l];
                     }
 

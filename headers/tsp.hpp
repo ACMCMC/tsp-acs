@@ -47,6 +47,7 @@ public:
     std::string getName() const;
     blaze::DynamicVector<long unsigned int, false> getBestPath() const;
     void localSearch3Opt();
+    void localSearch2Opt();
 private:
     long unsigned int dimension;
     std::string name;
