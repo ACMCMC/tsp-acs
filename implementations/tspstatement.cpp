@@ -275,12 +275,15 @@ void TSPStatement::solve_aco()
                 {
                     if (originalACOCosts[k] == cost)
                     {
-                        alreadyExists = 1;
-                        break;
+                        alreadyExists++;
+                        if (alreadyExists > 2) // Save the same cost (not necessarily same solution) at most 3 times
+                        {
+                            break;
+                        }
                     }
                 }
 
-                if (alreadyExists)
+                if (alreadyExists > 3)
                 {
                     continue;
                 }
