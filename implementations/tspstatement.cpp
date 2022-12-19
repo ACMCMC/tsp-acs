@@ -5,6 +5,8 @@
 #include <sstream>
 #include <chrono>
 
+#define TIME
+
 long unsigned int TSPStatement::getDimension() const
 {
     return dimension;
@@ -146,8 +148,8 @@ void offlineUpdatePheromone(blaze::DynamicMatrix<double> &pheromoneMatrix, blaze
         node1 = node2; // node2 from the previous iteration
         node2 = visitedNodes[i];
         double newAmount = pheromoneMatrix(node1, node2) + (TSPConstants::rho * pow(distanceMatrix.rows(), 3)) / cost; // rho * n / cost (temporal fix)
-        //double newAmount = pheromoneMatrix(node1, node2) + (TSPConstants::rho) / cost;
-        // double newAmount = pheromoneMatrix(node1, node2) + 1.0 / cost;
+        // double newAmount = pheromoneMatrix(node1, node2) + (TSPConstants::rho) / cost;
+        //  double newAmount = pheromoneMatrix(node1, node2) + 1.0 / cost;
         pheromoneMatrix(node1, node2) = newAmount;
         pheromoneMatrix(node2, node1) = newAmount;
     }
@@ -158,11 +160,18 @@ void TSPStatement::solve_aco()
     // Solution using the Ant Colony Optimization algorithm
 
     // Parameters
-    auto timeout = TSPConstants::timeout; // Timeout for the algorithm
+    auto timeout = TSPConstants::timeout;                     // Timeout for the algorithm
     auto finish = std::chrono::system_clock::now() + timeout; // Stop after 3 minutes
     double deadlineInSeconds = std::chrono::duration<double>(timeout).count();
 
     double exploitProbability = 0.3;
+
+    int lastLocalSearchImproved = 0; // 0 = no, 1 = yes
+
+#ifdef TIME
+    std::chrono::duration<double> totalMovementsTime = std::chrono::duration<double>::zero();
+    std::chrono::duration<double> totalLocalSearchTime = std::chrono::duration<double>::zero();
+#endif
 
     // Initialize pheromone matrix
     long unsigned int dimension = getDimension();
@@ -209,6 +218,9 @@ void TSPStatement::solve_aco()
         // Calculate the target value of the function now, to avoid doing it in the inner loop
         blaze::DynamicMatrix<double> precalculatedTargetMatrix = (blaze::pow(pheromone, TSPConstants::alpha) % blaze::pow(inverseDistanceMatrix, TSPConstants::beta));
 
+#ifdef TIME
+        auto startMovements = std::chrono::system_clock::now(); // Stop after 3 minutes
+#endif
         // Visit all nodes
         for (long unsigned int j = 0; j < dimension - 1; j++)
         {
@@ -221,6 +233,10 @@ void TSPStatement::solve_aco()
                 ant.localUpdatePheromone(pheromone);
             }
         }
+#ifdef TIME
+        auto finishMovements = std::chrono::system_clock::now(); // Stop after 3 minutes
+        totalMovementsTime += std::chrono::duration<double>(finishMovements - startMovements);
+#endif
 
         int isThereANewBest = 0; // 0 = no, 1 = yes
 
@@ -240,11 +256,22 @@ void TSPStatement::solve_aco()
             }
         }
 
-        if (TSPConstants::localSearchEnabled && isThereANewBest)
+        if (TSPConstants::localSearchEnabled && (isThereANewBest || lastLocalSearchImproved))
         {
-            // Local search only if there is a new best solution
-            localSearch2Opt();
-            localSearch3Opt();
+#ifdef TIME
+            auto startLocalSearch = std::chrono::system_clock::now(); // Stop after 3 minutes
+#endif
+                                                                      // Local search only if there is a new best solution
+            int localSearch2OptImproved = localSearch2Opt();
+            // std::cout << bestPath << std::endl;
+            int localSearch3OptImproved = localSearch3Opt();
+            // std::cout << bestPath << std::endl;
+            std::cout << "[Iteration " << iteration << "] Best cost after local search: " << bestCost << std::endl;
+            lastLocalSearchImproved = localSearch2OptImproved || localSearch3OptImproved;
+#ifdef TIME
+            auto endLocalSearch = std::chrono::system_clock::now(); // Stop after 3 minutes
+            totalLocalSearchTime += std::chrono::duration<double>(endLocalSearch - startLocalSearch);
+#endif
         }
 
         // Offline pheromone update
@@ -257,11 +284,17 @@ void TSPStatement::solve_aco()
         // std::cout << "Pheromone matrix: " << std::endl;
         // std::cout << pheromone << std::endl;
     }
+
+#ifdef TIME
+    std::cout << "Total movements time: " << totalMovementsTime.count() << " seconds" << std::endl;
+    std::cout << "Total local search time: " << totalLocalSearchTime.count() << " seconds" << std::endl;
+#endif
 }
 
-void TSPStatement::localSearch2Opt()
+int TSPStatement::localSearch2Opt()
 {
     // 2-opt local search
+    int isThereANewBest = 0; // 0 = no, 1 = yes
 
     /*blaze::DynamicVector<long unsigned int> testPath(8);
     testPath[0] = 0;
@@ -296,9 +329,9 @@ void TSPStatement::localSearch2Opt()
                 }
                     std::cout << "New path: " << newPath << std::endl;*/
 
-    for (long unsigned int i = 0; i < bestPath.size() - 2; i++)
+    for (long unsigned int i = 0; i < bestPath.size() - 3; i++)
     {
-        for (long unsigned int j = i + 2; j < bestPath.size(); j++)
+        for (long unsigned int j = i + 2; j < bestPath.size() - 1; j++)
         {
             // Calculate the gain of the swap
             double gain = 0;
@@ -337,14 +370,21 @@ void TSPStatement::localSearch2Opt()
 
                 // Update the best path
                 bestPath = newPath;
+
+                // std::cout << "Improved with 2-opt! Gain: " << gain << std::endl;
+                isThereANewBest = 1;
             }
         }
     }
+
+    return isThereANewBest;
 };
 
-void TSPStatement::localSearch3Opt()
+int TSPStatement::localSearch3Opt()
 {
     // 3-opt local search
+    int isThereANewBest = 0; // 0 = no, 1 = yes
+
     /*blaze::DynamicVector<long unsigned int> testPath(14);
     testPath[0] = 0;
     testPath[1] = 1;
@@ -427,10 +467,15 @@ void TSPStatement::localSearch3Opt()
 
                     // Update the best path
                     bestPath = newPath;
+
+                    // std::cout << "Improved with 3-opt! Gain: " << gain << std::endl;
+                    isThereANewBest = 1;
                 }
             }
         }
     }
+
+    return isThereANewBest;
 };
 
 blaze::DynamicVector<long unsigned int> TSPStatement::getBestPath() const
@@ -452,9 +497,10 @@ std::string TSPStatement::getName() const
 {
     return name;
 }
-    
-void TSPStatement::writeSolution(const char* filename) {
-    double costDiff = (std::floor(getBestCost()) - ((double) getBestKnown())) / ((double) getBestKnown());
+
+void TSPStatement::writeSolution(const char *filename)
+{
+    double costDiff = (std::floor(getBestCost()) - ((double)getBestKnown())) / ((double)getBestKnown());
 
     std::ofstream resultsFile;
     // The filename was "./problems/eil76.tsp", so we want to write the results to "./problems/eil76.opt.tour"
@@ -469,7 +515,8 @@ void TSPStatement::writeSolution(const char* filename) {
     resultsFile << "TOUR_LENGTH : " << getBestCost() << std::endl;
     resultsFile << "ERROR : " << costDiff << std::endl;
     resultsFile << "TOUR_SECTION" << std::endl;
-    for (unsigned long int i = 0; i < getBestPath().size() - 1; i++) {
+    for (unsigned long int i = 0; i < getBestPath().size() - 1; i++)
+    {
         resultsFile << getBestPath()[i] << std::endl;
     }
     resultsFile << "-1" << std::endl;

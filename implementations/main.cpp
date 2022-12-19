@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 
     statement.read(argv[1]);
 
-    TSPConstants::nAnts = TSPConstants::nAnts * floor(statement.getDimension() / 100);
+    TSPConstants::nAnts = TSPConstants::nAnts * ceil(((double) statement.getDimension()) / 100.0);
 
     srand(1); // Set the seed for the random number generator. This is so that the results are reproducible.
 

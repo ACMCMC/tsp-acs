@@ -47,9 +47,9 @@ public:
     int getBestCost() const;
     std::string getName() const;
     blaze::DynamicVector<long unsigned int, false> getBestPath() const;
-    void localSearch3Opt();
+    int localSearch3Opt();
     void writeSolution(const char* filename);
-    void localSearch2Opt();
+    int localSearch2Opt();
 private:
     long unsigned int dimension;
     std::string name;
