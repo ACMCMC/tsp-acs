@@ -203,6 +203,8 @@ void TSPStatement::solve_aco()
     blaze::DynamicMatrix<double> inverseDistanceMatrix = blaze::pow(distanceMatrix, -1.0);                // All elements are 1/distance
     blaze::DynamicMatrix<double> heuristicMatrix = blaze::pow(inverseDistanceMatrix, TSPConstants::beta); // All elements are (1/distance)^beta
 
+    double lastPercentage = 0.0;
+
     // Initialize ants
     // Randomly position nAnts artificial ants on nNodes nodes
     std::vector<Ant> ants;
@@ -215,10 +217,11 @@ void TSPStatement::solve_aco()
 
         exploitProbability = 0.5 + 0.2 * percentage; // Start with 50% exploitation, then increase to 70%
 
-        if (iteration % 100 == 0)
+        if (percentage - lastPercentage >= 0.009)
         {
             // Print progress
             printProgress(percentage, name);
+            lastPercentage = percentage;
         }
 
         // Generate nAnts ants
@@ -276,14 +279,14 @@ void TSPStatement::solve_aco()
                     if (originalACOCosts[k] == cost)
                     {
                         alreadyExists++;
-                        if (alreadyExists > 2) // Save the same cost (not necessarily same solution) at most 3 times
+                        if (alreadyExists >= 2) // Save the same cost (not necessarily same solution) at most 2 times
                         {
                             break;
                         }
                     }
                 }
 
-                if (alreadyExists > 3)
+                if (alreadyExists >= 2)
                 {
                     continue;
                 }
@@ -294,8 +297,8 @@ void TSPStatement::solve_aco()
                 originalACOCosts.push_back(cost);
                 optimum.push_back(0);
 
-                std::cout << "\r" << std::endl
-                          << "[Iteration " << iteration << "] Saving with cost: " << cost << std::endl;
+                //std::cout << "\r" << std::endl
+                //          << "[Iteration " << iteration << "] Saving with cost: " << cost << std::endl;
 
                 if (cost < minACOLength) // Update the best solution found by ACO
                 {
@@ -305,7 +308,20 @@ void TSPStatement::solve_aco()
             averagePathLength += cost;
         }
         averagePathLength /= TSPConstants::nAnts;
-        savePathThreshold = std::min(savePathThreshold, (2.0 * minACOLength + averagePathLength) / 3.0); // Middle ground between the average and the best
+        savePathThreshold = std::min(savePathThreshold, (4.0 * minACOLength + averagePathLength) / 5.0); // Middle ground between the average and the best
+
+        // Remove bad solutions
+        for (long unsigned int j = 0; j < bestCosts.size(); j++)
+        {
+            if (bestCosts[j] > savePathThreshold)
+            {
+                bestPaths.erase(bestPaths.begin() + j);
+                bestCosts.erase(bestCosts.begin() + j);
+                originalACOCosts.erase(originalACOCosts.begin() + j);
+                optimum.erase(optimum.begin() + j);
+                j--;
+            }
+        }
 
         if (TSPConstants::localSearchEnabled && percentage > 0.2 && (isThereANewBest || lastLocalSearchImproved))
         {
