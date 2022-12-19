@@ -9,7 +9,14 @@ beta = 8.95666582
 rho = 1.202
 phi = 0.8452
 tau0 = 0.3449
+nAnts = 10
 
+problems_full = ["./problems/ch130.tsp", "./problems/d198.tsp", "./problems/eil76.tsp", "./problems/fl1577.tsp", "./problems/kroA100.tsp",
+                "./problems/lin318.tsp", "./problems/pcb442.tsp", "./problems/pr439.tsp", "./problems/rat783.tsp", "./problems/u1060.tsp"]
+
+problems_reduced = ["./problems/ch130.tsp", "./problems/d198.tsp", "./problems/eil76.tsp", "./problems/fl1577.tsp", "./problems/pcb442.tsp", "./problems/rat783.tsp", "./problems/u1060.tsp"]
+
+problems = problems_reduced
 
 def process_problem(data):
     #print(f"Processing problem {data[0]}")
@@ -33,12 +40,10 @@ def process_problem(data):
     return return_val
 
 
-def program(nAnts):
+def program(rho, phi, tau0):
     # Create an empty file to store the result. If it exists, it will be overwritten.
     open("python_result.tmp", "w").close()
     #p = subprocess.Popen(["parallel", "./implementations/tsp_run", "{}", "python_result.tmp", str(alpha), str(beta), ":::", ], stdout = subprocess.PIPE)
-    problems = ["./problems/ch130.tsp", "./problems/d198.tsp", "./problems/eil76.tsp", "./problems/fl1577.tsp", "./problems/kroA100.tsp",
-                "./problems/lin318.tsp", "./problems/pcb442.tsp", "./problems/pr439.tsp", "./problems/rat783.tsp", "./problems/u1060.tsp"]
     #problems = ["./problems/eil76.tsp"]
     #problems = ["./problems/u1060.tsp"]
     #processes = [subprocess.Popen(["./implementations/tsp_run", p, "python_result.tmp", str(alpha), str(beta)]) for p in problems]
@@ -53,16 +58,16 @@ def program(nAnts):
 # Set range of C to optimize for.
 # bayes_opt requires this to be a dictionary.
 pbounds = {
-    "alpha": [0, 10],
-    "beta": [0, 10],
-#}
-#pbounds = {
-    "rho": [1e-10, 0.1],
-    "phi": [1e-10, 0.1],
-    "tau0": [0, 1.5],
+    "alpha": [0, 6],
+    "beta": [0, 6],
 }
 pbounds = {
-    "nAnts": [5, 100],
+    "nAnts": [5, 50],
+}
+pbounds = {
+    "rho": [1e-10, 0.1],
+    "phi": [1e-10, 0.1],
+    "tau0": [1e-5, 0.1],
 }
 
 # Create a BayesianOptimization optimizer,

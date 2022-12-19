@@ -5,7 +5,7 @@
 #include <sstream>
 #include <chrono>
 
-#define TIME
+#define TIME_NOT
 
 long unsigned int TSPStatement::getDimension() const
 {
@@ -164,7 +164,7 @@ void TSPStatement::solve_aco()
     auto finish = std::chrono::system_clock::now() + timeout; // Stop after 3 minutes
     double deadlineInSeconds = std::chrono::duration<double>(timeout).count();
 
-    double exploitProbability = 0.3;
+    double exploitProbability = 0.1;
 
     int lastLocalSearchImproved = 0; // 0 = no, 1 = yes
 
@@ -197,7 +197,7 @@ void TSPStatement::solve_aco()
             double percentage = 1.0 - (remainingSeconds / deadlineInSeconds);
             printProgress(percentage, name);
 
-            exploitProbability = 0.3 + 0.4 * percentage; // Start with 30% exploitation, then increase to 70%
+            exploitProbability = 0.1 + 0.4 * percentage; // Start with 10% exploitation, then increase to 50%
         }
 
         // Generate nAnts ants
