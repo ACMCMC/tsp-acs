@@ -9,14 +9,14 @@ beta = 8.95666582
 rho = 1.202
 phi = 0.8452
 tau0 = 0.3449
-nAnts = 10
+nAnts = 15
 
 problems_full = ["./problems/ch130.tsp", "./problems/d198.tsp", "./problems/eil76.tsp", "./problems/fl1577.tsp", "./problems/kroA100.tsp",
                 "./problems/lin318.tsp", "./problems/pcb442.tsp", "./problems/pr439.tsp", "./problems/rat783.tsp", "./problems/u1060.tsp"]
 
 problems_reduced = ["./problems/ch130.tsp", "./problems/d198.tsp", "./problems/eil76.tsp", "./problems/fl1577.tsp", "./problems/pcb442.tsp", "./problems/rat783.tsp", "./problems/u1060.tsp"]
 
-problems = problems_reduced
+problems = problems_full
 
 def process_problem(data):
     #print(f"Processing problem {data[0]}")
@@ -40,7 +40,7 @@ def process_problem(data):
     return return_val
 
 
-def program(rho, phi, tau0):
+def program(alpha, beta, rho, phi):
     # Create an empty file to store the result. If it exists, it will be overwritten.
     open("python_result.tmp", "w").close()
     #p = subprocess.Popen(["parallel", "./implementations/tsp_run", "{}", "python_result.tmp", str(alpha), str(beta), ":::", ], stdout = subprocess.PIPE)
@@ -58,16 +58,14 @@ def program(rho, phi, tau0):
 # Set range of C to optimize for.
 # bayes_opt requires this to be a dictionary.
 pbounds = {
+    "nAnts": [5, 50],
+    "tau0": [10e-12, 10e-4],
+}
+pbounds = {
     "alpha": [0, 6],
     "beta": [0, 6],
-}
-pbounds = {
-    "nAnts": [5, 50],
-}
-pbounds = {
-    "rho": [1e-10, 0.1],
-    "phi": [1e-10, 0.1],
-    "tau0": [1e-5, 0.1],
+    "rho": [0.75, 0.99],
+    "phi": [0.75, 0.99],
 }
 
 # Create a BayesianOptimization optimizer,

@@ -147,9 +147,10 @@ void offlineUpdatePheromone(blaze::DynamicMatrix<double> &pheromoneMatrix, blaze
     {
         node1 = node2; // node2 from the previous iteration
         node2 = visitedNodes[i];
-        double newAmount = pheromoneMatrix(node1, node2) + (TSPConstants::rho * pow(distanceMatrix.rows(), 3)) / cost; // rho * n / cost (temporal fix)
-        // double newAmount = pheromoneMatrix(node1, node2) + (TSPConstants::rho) / cost;
-        //  double newAmount = pheromoneMatrix(node1, node2) + 1.0 / cost;
+
+        // double newAmount = pheromoneMatrix(node1, node2) + (TSPConstants::rho * pow(distanceMatrix.rows(), 10)) / cost; // rho * n / cost (temporal fix)
+        double newAmount = pheromoneMatrix(node1, node2) + (TSPConstants::rho) / cost;
+        //double newAmount = pheromoneMatrix(node1, node2) + 1.0 / cost;
         pheromoneMatrix(node1, node2) = newAmount;
         pheromoneMatrix(node2, node1) = newAmount;
     }
@@ -164,7 +165,7 @@ void TSPStatement::solve_aco()
     auto finish = std::chrono::system_clock::now() + timeout; // Stop after 3 minutes
     double deadlineInSeconds = std::chrono::duration<double>(timeout).count();
 
-    double exploitProbability = 0.1;
+    double exploitProbability = 0.5;
 
     int lastLocalSearchImproved = 0; // 0 = no, 1 = yes
 
@@ -182,6 +183,7 @@ void TSPStatement::solve_aco()
 
     // Utility matrix
     blaze::DynamicMatrix<double> inverseDistanceMatrix = blaze::pow(distanceMatrix, -1); // All elements are 1/distance
+    blaze::DynamicMatrix<double> heuristicMatrix = blaze::pow(inverseDistanceMatrix, TSPConstants::beta); // All elements are (1/distance)^beta
 
     // Initialize ants
     // Randomly position nAnts artificial ants on nNodes nodes
@@ -189,15 +191,15 @@ void TSPStatement::solve_aco()
     // Main loop
     for (long unsigned int iteration = 0; std::chrono::system_clock::now() < finish; iteration++)
     {
-        // Perform "expensive" updates every 25 iterations
-        if (iteration % 25 == 0)
+        // Perform "expensive" updates every 15 iterations
+        if (iteration % 15 == 0)
         {
             // Print progress
             double remainingSeconds = std::chrono::duration<double>(finish - std::chrono::system_clock::now()).count();
             double percentage = 1.0 - (remainingSeconds / deadlineInSeconds);
             printProgress(percentage, name);
 
-            exploitProbability = 0.1 + 0.4 * percentage; // Start with 10% exploitation, then increase to 50%
+            exploitProbability = 0.5 + 0.3 * percentage; // Start with 50% exploitation, then increase to 80%
         }
 
         // Generate nAnts ants
@@ -216,7 +218,7 @@ void TSPStatement::solve_aco()
 
         // Construct solutions
         // Calculate the target value of the function now, to avoid doing it in the inner loop
-        blaze::DynamicMatrix<double> precalculatedTargetMatrix = (blaze::pow(pheromone, TSPConstants::alpha) % blaze::pow(inverseDistanceMatrix, TSPConstants::beta));
+        blaze::DynamicMatrix<double> precalculatedTargetMatrix = (blaze::pow(pheromone, TSPConstants::alpha) % heuristicMatrix);
 
 #ifdef TIME
         auto startMovements = std::chrono::system_clock::now(); // Stop after 3 minutes

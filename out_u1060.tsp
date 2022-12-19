@@ -1,25 +1,24 @@
-Using alpha = 8.95666582 beta = 8.95666582 rho = 0.03455607276974871 phi = 0.018626021219141073 tau0 = 0.039682779748324695 nAnts = 10
+(            4            2 )
+(            2            2 )
+
+(            1            2 )
+(            2            2 )
+
+Using alpha = 2.0090026247500825 beta = 0.0010681833317911504 rho = 0.7824308530729988 phi = 0.8409469695358073 tau0 = 3.3204841376786835e-05 nAnts = 15
 Reading file: ./problems/u1060.tsp
 Name: u1060
 Best known: 224094
 Dimension: 1060
 Distance matrix: 1060x1060
 u1060:   0% [                                                            ]
-[Iteration 0] Best cost: 309640
+[Iteration 0] Best cost: 3276438
 
-[Iteration 0] Best cost: 308177
+[Iteration 0] Best cost: 3276417
 
-[Iteration 0] Best cost: 307798
+[Iteration 0] Best cost: 3266438
 
-[Iteration 0] Best cost: 305016
+[Iteration 0] Best cost: 3257325
 
-[Iteration 0] Best cost: 298320
-
-[Iteration 0] Best cost: 297490
-[Iteration 0] Best cost after local search: 251764
-[Iteration 1] Best cost after local search: 240124
-[Iteration 2] Best cost after local search: 238437
-[Iteration 3] Best cost after local search: 238050
-[Iteration 4] Best cost after local search: 237963
-[Iteration 5] Best cost after local search: 237963
-u1060:  18% [|||||||||||                                                 ]u1060:  31% [|||||||||||||||||||                                         ]u1060:  44% [||||||||||||||||||||||||||                                  ]
+[Iteration 0] Best cost: 3154752
+[Iteration 0] Best cost after local search: 292129
+[Iteration 1] Best cost after local search: 252055

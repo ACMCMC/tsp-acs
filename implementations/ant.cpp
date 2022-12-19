@@ -6,32 +6,34 @@
 
 long unsigned int Ant::_index = 0;
 
-Ant::Ant(Node& start, std::vector<Node> nodes) : currentNode(start), visitedNodes({start}), unvisitedNodes(nodes)
+Ant::Ant(Node &start, std::vector<Node> nodes) : currentNode(start), visitedNodes({start}), unvisitedNodes(nodes)
 {
   unvisitedNodes.erase(unvisitedNodes.begin() + start.getInternalId());
-  //std::cout << "Ant " << _id << ": Created at node " << start.getHumanId() << std::endl;
+  // std::cout << "Ant " << _id << ": Created at node " << start.getHumanId() << std::endl;
 }
 
 void Ant::move(blaze::DynamicMatrix<double> &precalculatedTargetMatrix, double exploitProbability)
 {
-  // Calculate the probability of moving to each node in the unvisited nodes list
-  blaze::DynamicVector<double> probabilities(unvisitedNodes.size());
-  double sum = 0;
-  for (long unsigned int i = 0; i < unvisitedNodes.size(); i++)
-  {
-    Node node = unvisitedNodes[i];
-    double probability = precalculatedTargetMatrix(currentNode.getInternalId(), node.getInternalId());
-    probabilities[i] = probability;
-    sum += probability;
-  }
+  int random_explore = 0;
 
-  // Normalize the probabilities
-  probabilities /= sum;
-
-  // Decide whether to exploit or explore based on exploitProbability
   double random = (double)rand() / RAND_MAX;
   if (random < exploitProbability)
   {
+    // Calculate the probability of moving to each node in the unvisited nodes list
+    blaze::DynamicVector<double> probabilities(unvisitedNodes.size());
+    double sum = 0;
+    for (long unsigned int i = 0; i < unvisitedNodes.size(); i++)
+    {
+      Node node = unvisitedNodes[i];
+      double probability = precalculatedTargetMatrix(currentNode.getInternalId(), node.getInternalId());
+      probabilities[i] = probability;
+      sum += probability;
+    }
+
+    // Normalize the probabilities
+    probabilities /= sum;
+
+    // Decide whether to exploit or explore based on exploitProbability
     // Exploit
     // Choose the node with the highest probability
     long unsigned int maxIndex = 0;
@@ -49,18 +51,44 @@ void Ant::move(blaze::DynamicMatrix<double> &precalculatedTargetMatrix, double e
     currentNode = unvisitedNodes[maxIndex];
     visitedNodes.push_back(currentNode);
     unvisitedNodes.erase(unvisitedNodes.begin() + maxIndex);
+    return;
+  }
+  else if (random_explore)
+  {
+    double random = (double)rand() / RAND_MAX;
+    int index = random * unvisitedNodes.size();
+
+    // Move to that node
+    currentNode = unvisitedNodes[index];
+    visitedNodes.push_back(currentNode);
+    unvisitedNodes.erase(unvisitedNodes.begin() + index);
+    return;
   }
   else
   {
     // Explore
+    // Calculate the probability of moving to each node in the unvisited nodes list
+    blaze::DynamicVector<double> probabilities(unvisitedNodes.size());
+    double sum = 0;
+    for (long unsigned int i = 0; i < unvisitedNodes.size(); i++)
+    {
+      Node node = unvisitedNodes[i];
+      double probability = precalculatedTargetMatrix(currentNode.getInternalId(), node.getInternalId());
+      probabilities[i] = probability;
+      sum += probability;
+    }
+
+    // Normalize the probabilities
+    probabilities /= sum;
+
     // Choose a random node
     double random = (double)rand() / RAND_MAX;
-    double sum = 0;
+    double sumP = 0;
     long unsigned int index = 0;
     for (long unsigned int i = 0; i < probabilities.size(); i++)
     {
-      sum += probabilities[i];
-      if (sum > random)
+      sumP += probabilities[i];
+      if (sumP > random)
       {
         index = i;
         break;
@@ -71,8 +99,9 @@ void Ant::move(blaze::DynamicMatrix<double> &precalculatedTargetMatrix, double e
     currentNode = unvisitedNodes[index];
     visitedNodes.push_back(currentNode);
     unvisitedNodes.erase(unvisitedNodes.begin() + index);
+    return;
   }
-  //std::cout << "Ant " << _id << ": Moved to node " << currentNode.getHumanId() << std::endl;
+  // std::cout << "Ant " << _id << ": Moved to node " << currentNode.getHumanId() << std::endl;
 }
 
 void Ant::localUpdatePheromone(blaze::DynamicMatrix<double> &pheromoneMatrix)
@@ -115,6 +144,7 @@ blaze::DynamicVector<long unsigned int> Ant::getSolutionAsVector()
 /**
  * @brief Ant destructor
  */
-Ant::~Ant() {
-  //std::cout << "Ant " << _id << ": Destroyed" << std::endl;
+Ant::~Ant()
+{
+  // std::cout << "Ant " << _id << ": Destroyed" << std::endl;
 }

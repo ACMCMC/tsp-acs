@@ -3,12 +3,13 @@
 #include <fstream>
 #include <sstream>
 
-double TSPConstants::alpha = 3.854172313492491;
-double TSPConstants::beta = 9.502065547951132;
-double TSPConstants::rho = 0.00018384087804787033;      // Evaporation rate
-double TSPConstants::phi = 0.0068969337927708005;      // Pheromone decay rate
-double TSPConstants::tau0 = 0.023001192342792635;       // Initial pheromone
-long unsigned int TSPConstants::nAnts = 10;      // Number of ants
+double TSPConstants::alpha = 2.388;
+double TSPConstants::beta = 5.467;
+double TSPConstants::rho = 0.8801; // Evaporation rate
+double TSPConstants::phi = 0.8899;  // Pheromone decay rate
+double TSPConstants::tau0 = 0.000208;  // Initial pheromone
+double TSPConstants::maxPheromone = 0.1;           // max Pheromone value
+long unsigned int TSPConstants::nAnts = 15;        // Number of ants
 
 int main(int argc, char **argv)
 {
@@ -35,14 +36,16 @@ int main(int argc, char **argv)
 
     statement.read(argv[1]);
 
-    TSPConstants::nAnts = TSPConstants::nAnts * ceil(((double) statement.getDimension()) / 100.0);
+    TSPConstants::nAnts = TSPConstants::nAnts * ceil(((double)statement.getDimension()) / 100.0);
+    TSPConstants::maxPheromone = 1.0 / (TSPConstants::rho * ((double)statement.getBestKnown()));
+    TSPConstants::tau0 = (TSPConstants::rho) * 0.8;
 
     srand(1); // Set the seed for the random number generator. This is so that the results are reproducible.
 
     statement.solve_aco();
 
     std::cout << "Best path found: " << statement.getBestPath() << std::endl;
-    double costDiff = (std::floor(statement.getBestCost()) - ((double) statement.getBestKnown())) / ((double) statement.getBestKnown());
+    double costDiff = (std::floor(statement.getBestCost()) - ((double)statement.getBestKnown())) / ((double)statement.getBestKnown());
     std::cout << "Cost difference: " << costDiff << std::endl;
 
     // Append the result to the results file
