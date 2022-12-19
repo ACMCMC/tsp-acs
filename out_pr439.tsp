@@ -1,32 +1,8 @@
-(            4            2 )
-(            2            2 )
-
-(            1            2 )
-(            2            2 )
-
-Using alpha = 2.0090026247500825 beta = 0.0010681833317911504 rho = 0.7824308530729988 phi = 0.8409469695358073 tau0 = 3.3204841376786835e-05 nAnts = 15
+Using alpha = 1.3004264056430888 beta = 1.0 rho = 0.05 phi = 0.05 tau0 = 1.0002287496346898 nAnts = 15 min_pheromone = 0.000720604168948716
 Reading file: ./problems/pr439.tsp
 Name: pr439
 Best known: 107217
 Dimension: 439
 Distance matrix: 439x439
-pr439:   0% [                                                            ]
-[Iteration 0] Best cost: 1040906
-
-[Iteration 0] Best cost: 1002090
-
-[Iteration 0] Best cost: 952697
-
-[Iteration 0] Best cost: 943347
-
-[Iteration 0] Best cost: 914269
-
-[Iteration 0] Best cost: 824605
-[Iteration 0] Best cost after local search: 145918
-[Iteration 1] Best cost after local search: 121617
-[Iteration 2] Best cost after local search: 116980
-[Iteration 3] Best cost after local search: 114663
-[Iteration 4] Best cost after local search: 113997
-[Iteration 5] Best cost after local search: 113901
-[Iteration 6] Best cost after local search: 113901
-pr439:   3% [||                                                          ]pr439:   6% [|||                                                         ]pr439:   8% [||||                                                        ]pr439:  10% [||||||                                                      ]pr439:  12% [|||||||                                                     ]
+pr439:   0% [                                                            ]pr439:   2% [|                                                           ]pr439:   5% [|||                                                         ]pr439:   7% [||||                                                        ]pr439:  10% [||||||                                                      ]pr439:  12% [|||||||                                                     ]pr439:  15% [|||||||||                                                   ]pr439:  17% [||||||||||                                                  ]pr439:  20% [||||||||||||                                                ]pr439:  23% [|||||||||||||                                               ]pr439:  25% [|||||||||||||||                                             ]pr439:  28% [|||||||||||||||||                                           ]pr439:  54% [||||||||||||||||||||||||||||||||                            ]pr439:  56% [||||||||||||||||||||||||||||||||||                          ]pr439:  59% [|||||||||||||||||||||||||||||||||||                         ]pr439:  61% [|||||||||||||||||||||||||||||||||||||                       ]pr439:  64% [||||||||||||||||||||||||||||||||||||||                      ]pr439:  67% [||||||||||||||||||||||||||||||||||||||||                    ]pr439:  72% [|||||||||||||||||||||||||||||||||||||||||||                 ]pr439:  77% [||||||||||||||||||||||||||||||||||||||||||||||              ]pr439:  84% [||||||||||||||||||||||||||||||||||||||||||||||||||          ]Best path found: 108315
+Cost difference: 0.0102409

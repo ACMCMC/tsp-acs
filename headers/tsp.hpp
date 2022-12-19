@@ -11,7 +11,7 @@ public:
     static double rho;      // Evaporation rate
     static double phi;      // Pheromone decay rate
     static double tau0;       // Initial pheromone
-    static constexpr double minPheromone = 10e-15;       // Minimum pheromone value
+    static double minPheromone;       // Minimum pheromone value
     static double maxPheromone;       // Maximum pheromone value
     static long unsigned int nAnts;      // Number of ants
     static double alpha;      // Importance of pheromone
@@ -47,9 +47,9 @@ public:
     int getBestCost() const;
     std::string getName() const;
     blaze::DynamicVector<long unsigned int, false> getBestPath() const;
-    int localSearch3Opt();
+    int localSearch3Opt(std::vector<blaze::DynamicVector<long unsigned int>> &paths, std::vector<double> &costs, int i);
     void writeSolution(const char* filename);
-    int localSearch2Opt();
+    int localSearch2Opt(std::vector<blaze::DynamicVector<long unsigned int>> &paths, std::vector<double> &costs, int i);
 private:
     long unsigned int dimension;
     std::string name;

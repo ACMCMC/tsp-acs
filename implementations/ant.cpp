@@ -33,6 +33,8 @@ void Ant::move(blaze::DynamicMatrix<double> &precalculatedTargetMatrix, double e
     // Normalize the probabilities
     probabilities /= sum;
 
+    // std::cout << "Probabilities: " << probabilities << std::endl;
+
     // Decide whether to exploit or explore based on exploitProbability
     // Exploit
     // Choose the node with the highest probability
@@ -78,11 +80,8 @@ void Ant::move(blaze::DynamicMatrix<double> &precalculatedTargetMatrix, double e
       sum += probability;
     }
 
-    // Normalize the probabilities
-    probabilities /= sum;
-
     // Choose a random node
-    double random = (double)rand() / RAND_MAX;
+    double random = (double)rand() / sum;
     double sumP = 0;
     long unsigned int index = 0;
     for (long unsigned int i = 0; i < probabilities.size(); i++)
