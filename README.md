@@ -1,6 +1,6 @@
 # tsp-acs
 
-Implementation of the **Ant Colony System** for solving the **Travelling Salesman Problem**.
+Implementation of an **Ant Colony System** to solve the **Travelling Salesman Problem**.
 
 ## Algorithm
 
